@@ -1,0 +1,219 @@
+{% extends 'inventario/base.html' %}
+{% load static %}
+
+{% block title %}
+    Movimientos de stock - Agroquímica del Valle
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{% static 'inventario/styles/movimientos_stock.css' %}">
+{% endblock %}
+
+{% block contenido %}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Movimientos de stock</h1>
+        <p>Historial automático de ingresos de lotes y egresos por vencimiento.</p>
+    </div>
+</div>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- FILTROS -->
+<form method="GET" class="toolbar">
+
+    <input
+        type="text"
+        name="q"
+        value="{{ busqueda }}"
+        class="search-box"
+        placeholder="Buscar producto, lote u observaciones..."
+    >
+
+    <select name="tipo" class="filter-select"
+            onchange="this.form.submit()">
+
+        <option value="">Todos los movimientos</option>
+
+        {% for t in todos_tipos %}
+            {% if t.Nombre_tipo_movimiento == "Entrada de lote" or t.Nombre_tipo_movimiento == "Salida por vencimiento de producto" %}
+                <option
+                    value="{{ t.ID_Tipo_movimiento }}"
+                    {% if tipo_sel == t.ID_Tipo_movimiento|stringformat:"s" %}
+                        selected
+                    {% endif %}
+                >
+                    {% if t.Nombre_tipo_movimiento == "Entrada de lote" %}
+                        Ingreso de lote
+                    {% else %}
+                        Egreso por vencimiento
+                    {% endif %}
+                </option>
+            {% endif %}
+        {% endfor %}
+
+    </select>
+
+    <button type="submit" class="btn btn-secondary">
+        Buscar
+    </button>
+
+</form>
+
+<!-- TABLA DE MOVIMIENTOS -->
+<div class="card">
+
+    <div class="table-wrap">
+        <table class="custom-table">
+
+            <thead>
+                <tr>
+                    <th>Fecha y hora</th>
+                    <th>Producto</th>
+                    <th>Lote</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Usuario</th>
+                    <th>Observaciones</th>
+                    <th>Comprobante</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for m in movimientos %}
+
+                    {% with tipo=m.ID_Tipo_movimiento.Nombre_tipo_movimiento %}
+
+                        {% if tipo == "Entrada de lote" or tipo == "Salida por vencimiento de producto" %}
+
+                            <tr>
+
+                                <!-- FECHA Y HORA -->
+                                <td>
+                                    <span class="mov-fecha">
+                                        {{ m.Fecha_hora_movimiento|date:"d/m/Y" }}
+                                    </span>
+                                    <span class="mov-hora">
+                                        {{ m.Fecha_hora_movimiento|date:"H:i" }}
+                                    </span>
+                                </td>
+
+                                <!-- PRODUCTO -->
+                                <td>
+                                    {% if m.ID_Lote %}
+                                        {{ m.ID_Lote.ID_Producto.Nombre_producto }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- LOTE -->
+                                <td>
+                                    {% if m.ID_Lote %}
+                                        {{ m.ID_Lote.Numero_lote }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- TIPO -->
+                                <td>
+                                    {% if tipo == "Entrada de lote" %}
+                                        <span class="tag tag-entrada">
+                                            Ingreso de lote
+                                        </span>
+                                    {% else %}
+                                        <span class="tag tag-vencimiento">
+                                            Egreso por vencimiento
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- CANTIDAD -->
+                                <td>
+                                    {% if tipo == "Entrada de lote" %}
+                                        <span class="mov-cantidad pos">
+                                            +{{ m.Cantidad_movimiento_stock }}
+                                        </span>
+                                    {% else %}
+                                        <span class="mov-cantidad neg">
+                                            -{{ m.Cantidad_movimiento_stock }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- USUARIO -->
+                                <td>
+                                    {% if m.ID_Usuario %}
+                                        {{ m.ID_Usuario.Apellido_usuario }}
+                                        {{ m.ID_Usuario.Nombre_usuario }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <!-- OBSERVACIONES -->
+                                <td>
+                                    <span class="mov-obs">
+                                        {{ m.Observaciones|default:"—" }}
+                                    </span>
+                                </td>
+
+                                <!-- COMPROBANTE PDF -->
+                                <td>
+                                    <a
+                                        href="{% url 'comprobante_movimiento_pdf' m.ID_Movimiento_stock %}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="btn-comprobante"
+                                        title="Generar comprobante PDF"
+                                    >
+                                        📄 Generar PDF
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        {% endif %}
+
+                    {% endwith %}
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="8" class="tabla-vacia">
+                            No se encontraron movimientos de stock.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- PIE DE TABLA -->
+    <div class="tabla-pie">
+        <span>
+            {{ movimientos|length }}
+            movimiento{{ movimientos|length|pluralize }}
+        </span>
+
+        <span>Agroquímica del Valle</span>
+    </div>
+
+</div>
+
+{% endblock %}

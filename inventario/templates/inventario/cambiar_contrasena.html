@@ -1,0 +1,99 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cambiar contraseña - Agroquímica del Valle</title>
+
+    <link rel="stylesheet" href="{% static 'inventario/styles/login.css' %}">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <h1>Agroquímica del Valle</h1>
+
+        <div class="subtitle">
+            Cambio de contraseña
+        </div>
+
+        <div class="card">
+
+            <h2>Debe cambiar su contraseña</h2>
+
+            <p>
+                Por seguridad, debe establecer una nueva contraseña
+                antes de ingresar al sistema.
+            </p>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+
+                    <label for="nueva_contrasena">
+                        Nueva contraseña
+                    </label>
+
+                    <input
+                        type="password"
+                        id="nueva_contrasena"
+                        name="nueva_contrasena"
+                        placeholder="Ingrese una nueva contraseña"
+                        required
+                        minlength="8"
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="confirmar_contrasena">
+                        Confirmar contraseña
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmar_contrasena"
+                        name="confirmar_contrasena"
+                        placeholder="Repita la nueva contraseña"
+                        required
+                        minlength="8"
+                    >
+
+                </div>
+
+                {% if error %}
+                    <div class="error-box">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <button
+                    type="submit"
+                    class="btn-submit"
+                >
+                    Cambiar contraseña
+                </button>
+
+                <div class="footer-text">
+                    La contraseña debe tener al menos 8 caracteres.
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
+

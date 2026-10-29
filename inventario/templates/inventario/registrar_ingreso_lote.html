@@ -1,0 +1,192 @@
+{% extends 'inventario/base.html' %}
+{% load static %}
+
+{% block title %}Consultar lotes - Agroquímica del Valle{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'inventario/styles/ingreso_lote.css' %}">
+{% endblock %}
+
+{% block contenido %}
+
+<div class="lt-page">
+
+    <!-- ENCABEZADO -->
+    <header class="lt-header">
+        <div>
+            <h1 class="lt-title">Consultar lotes</h1>
+        </div>
+    </header>
+
+    <!-- MENSAJES -->
+    {% if messages %}
+    <div class="lt-messages">
+        {% for message in messages %}
+        <div class="lt-message {{ message.tags }}">
+            <span>{{ message }}</span>
+            <button type="button"
+                    class="lt-message-cerrar"
+                    onclick="this.parentElement.remove()"
+                    aria-label="Cerrar mensaje">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- BÚSQUEDA Y FILTROS -->
+    <form method="GET" class="lt-toolbar">
+
+        <div class="lt-search">
+            <svg class="lt-icon" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m21 21-4.3-4.3"/>
+            </svg>
+
+            <input type="text"
+                   name="q"
+                   value="{{ busqueda|default:'' }}"
+                   placeholder="Buscar por lote, producto o proveedor..."
+                   aria-label="Buscar lotes">
+        </div>
+
+        <select name="marca"
+                class="lt-select"
+                aria-label="Filtrar por marca">
+
+            <option value="">Todas las marcas</option>
+
+            {% for marca in marcas %}
+            <option value="{{ marca }}"
+                    {% if marca_filtro == marca %}selected{% endif %}>
+                {{ marca }}
+            </option>
+            {% endfor %}
+        </select>
+
+        
+        <button type="submit" class="lt-btn lt-btn-primary">
+            Buscar
+        </button>
+
+
+    </form>
+
+    <!-- TABLA DE LOTES -->
+    {% with total=lotes|length %}
+    <section class="lt-card">
+
+        <div class="lt-table-wrap">
+            <table class="lt-table">
+
+                <thead>
+                    <tr>
+                        <th>Número de lote</th>
+                        <th>Producto</th>
+                        <th>Marca</th>
+                        <th>Proveedor</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Fecha de vencimiento</th>
+                        <th>Cantidad ingresada</th>
+                        <th>Cantidad actual</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for l in lotes %}
+                    <tr>
+
+                        <td>
+                            <span class="lt-num">
+                                {{ l.Numero_lote }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ l.ID_Producto.Nombre_producto }}
+                        </td>
+
+                        <td>
+                            {{ l.ID_Producto.Marca|default:"Sin marca" }}
+                        </td>
+
+                        <td class="lt-muted">
+                            {% if l.ID_Remito and l.ID_Remito.ID_Proveedor %}
+                                {{ l.ID_Remito.ID_Proveedor.nombre_proveedor }}
+                            {% else %}
+                                Sin atribuir
+                            {% endif %}
+                        </td>
+
+                        <td class="lt-muted">
+                            {{ l.Fecha_ingreso|date:"d/m/Y" }}
+                        </td>
+
+                        <td>
+                            {% if not l.Fecha_vencimiento %}
+
+                                <span class="lt-muted">
+                                    Sin vencimiento
+                                </span>
+
+                            {% elif l.Fecha_vencimiento < hoy %}
+
+                                <span class="lt-fecha lt-vencido">
+                                    {{ l.Fecha_vencimiento|date:"d/m/Y" }}
+                                </span>
+
+                            {% elif l.Fecha_vencimiento <= limite %}
+
+                                <span class="lt-fecha lt-por-vencer">
+                                    {{ l.Fecha_vencimiento|date:"d/m/Y" }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="lt-muted">
+                                    {{ l.Fecha_vencimiento|date:"d/m/Y" }}
+                                </span>
+
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="lt-cant">
+                                {{ l.Cantidad_ingresada }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="lt-cant">
+                                {{ l.Cantidad_actual }}
+                            </span>
+                        </td>
+
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="lt-vacio">
+                            No se encontraron lotes.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- TOTAL DE LOTES -->
+        <div class="lt-pie">
+            <span>
+                {{ total }} lote{{ total|pluralize }}
+                encontrado{{ total|pluralize }}
+            </span>
+        </div>
+
+    </section>
+    {% endwith %}
+
+</div>
+
+{% endblock %}

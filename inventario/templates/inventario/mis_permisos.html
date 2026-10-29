@@ -1,0 +1,88 @@
+{% extends 'inventario/base.html' %}
+{% load static %}
+
+{% block title %}
+Mis permisos - Agroquímica del Valle
+{% endblock %}
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'inventario/styles/perfiles.css' %}"
+>
+
+<link
+    rel="stylesheet"
+    href="{% static 'inventario/styles/mis_permisos.css' %}"
+>
+{% endblock %}
+
+{% block contenido %}
+
+<header class="header">
+    <h1>MIS PERMISOS</h1>
+</header>
+
+<section class="profiles-container">
+
+<div class="profile-card">
+
+    <div class="profile-header">
+
+        <div>
+
+            <h2>
+                {{ usuario.ID_Perfil.Nombre_perfil }}
+            </h2>
+
+            <span class="profile-id">
+                Permisos asignados a tu perfil
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="permissions-section">
+
+        <h3>Permisos disponibles</h3>
+
+        <div class="permissions-list">
+
+            {% for permiso in permisos %}
+
+                <div class="permission-item">
+
+                    <strong>
+                        {{ permiso.Nombre_permiso }}
+                    </strong>
+
+                    {% if permiso.Descripcion_permiso %}
+
+                        <span>
+                            {{ permiso.Descripcion_permiso }}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% empty %}
+
+                <p class="no-permissions">
+                    Tu perfil todavía no tiene permisos asignados.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+{% endblock %}

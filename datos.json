@@ -1,0 +1,27 @@
+[
+{
+  "model": "inventario.perfiles",
+  "pk": 1,
+  "fields": {
+    "Nombre_perfil": "Administrador",
+    "Estado_perfil": true
+  }
+},
+{
+  "model": "inventario.usuarios",
+  "pk": 1,
+  "fields": {
+    "ID_Perfil": 1,
+    "DNI": 12345678,
+    "Apellido_usuario": "Perez",
+    "Nombre_usuario": "Martin",
+    "Usuario": "perezm",
+    "Contrasena": "pbkdf2_sha256$1500000$BxgIJJZkV13Vhpmvl80b6V$OriTeJ59UJMMl449ptUPbCDZrVpV81HWCLZQCHOYBLE=",
+    "Email_usuario": "martin@gmail.com",
+    "Estado_usuario": true,
+    "Fecha_ultima_modificacion": "2026-10-05",
+    "Fecha_Baja": null,
+    "Cambiar_contrasena": false
+  }
+}
+]

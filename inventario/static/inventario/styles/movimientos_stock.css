@@ -1,0 +1,372 @@
+/* ============================================================
+   MOVIMIENTOS DE STOCK
+   ============================================================ */
+
+:root {
+    --verde-oscuro: #0f2e22;
+    --verde-medio: #166534;
+    --verde-boton: #1f6b46;
+    --fondo: #ffffff;
+    --blanco: #ffffff;
+    --borde: #e2e8e4;
+    --texto: #1b2a22;
+    --texto-suave: #6b7c73;
+    --rojo: #b91c1c;
+    --rojo-fondo: #fee2e2;
+    --verde-fondo: #dcfce7;
+    --ambar: #92400e;
+    --ambar-fondo: #fef3c7;
+}
+
+/* ============================================================
+   CONFIGURACIÓN GENERAL
+   ============================================================ */
+
+body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: 'Inter', sans-serif;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 0;
+}
+
+.page-header p {
+    color: var(--texto-suave);
+    font-size: 13px;
+    margin-top: 8px;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter .15s ease;
+}
+
+.btn:hover {
+    filter: brightness(1.08);
+}
+
+.btn-primary {
+    background: var(--verde-boton);
+    color: var(--blanco);
+}
+
+.btn-secondary {
+    background: var(--blanco);
+    color: var(--texto);
+    border: 1px solid var(--borde);
+}
+
+/* ============================================================
+   MENSAJES
+   ============================================================ */
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.message {
+    padding: 12px 16px;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--blanco);
+    font-size: 13px;
+}
+
+.message.success {
+    background: var(--verde-fondo);
+    border-color: #86efac;
+    color: #14532d;
+}
+
+.message.error {
+    background: var(--rojo-fondo);
+    border-color: #fca5a5;
+    color: #7f1d1d;
+}
+
+/* ============================================================
+   BÚSQUEDA Y FILTROS
+   ============================================================ */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 220px;
+    padding: 12px 16px;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--blanco);
+    color: var(--texto);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+.filter-select {
+    min-width: 220px;
+    padding: 12px 14px;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--blanco);
+    color: var(--texto);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+.search-box:focus,
+.filter-select:focus {
+    outline: 2px solid #86c5a1;
+    outline-offset: 1px;
+}
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.card {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+}
+
+.custom-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    border-bottom: 1px solid var(--borde);
+    white-space: nowrap;
+    background: #fafcfb;
+}
+
+.custom-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef2ef;
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+.custom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.custom-table tbody tr:hover {
+    background: #f8fbf9;
+}
+
+/* ============================================================
+   DATOS DEL MOVIMIENTO
+   ============================================================ */
+
+.mov-fecha {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mov-hora {
+    display: block;
+    margin-top: 2px;
+    color: var(--texto-suave);
+    font-size: 11px;
+}
+
+.mov-obs {
+    display: inline-block;
+    max-width: 360px;
+    color: var(--texto-suave);
+    overflow-wrap: anywhere;
+}
+
+.mov-cantidad {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.mov-cantidad.pos {
+    color: #15803d;
+}
+
+.mov-cantidad.neg {
+    color: var(--rojo);
+}
+
+.tabla-vacia {
+    padding: 36px 16px !important;
+    text-align: center;
+    color: var(--texto-suave);
+}
+
+.tabla-pie {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--borde);
+    background: #fafcfb;
+    color: var(--texto-suave);
+    font-size: 12px;
+}
+
+/* ============================================================
+   ETIQUETAS DE TIPO
+   ============================================================ */
+
+.tag {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tag-entrada {
+    background: var(--verde-fondo);
+    color: var(--verde-medio);
+}
+
+.tag-vencimiento {
+    background: var(--ambar-fondo);
+    color: var(--ambar);
+}
+
+/* ============================================================
+   COMPROBANTE PDF
+   ============================================================ */
+
+.btn-comprobante {
+    display: inline-block;
+    padding: 8px 11px;
+    background: var(--verde-oscuro);
+    color: var(--blanco);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background-color .2s ease;
+}
+
+.btn-comprobante:hover {
+    background: #174d32;
+    color: var(--blanco);
+}
+
+.btn-comprobante:focus-visible {
+    outline: 2px solid #86c5a1;
+    outline-offset: 3px;
+}
+
+/* ============================================================
+   DISEÑO RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .toolbar {
+        flex-direction: column;
+    }
+
+    .search-box,
+    .filter-select,
+    .btn-secondary {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .btn-secondary {
+        justify-content: center;
+    }
+
+    .tabla-pie {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        padding: 11px 12px;
+    }
+
+    .mov-obs {
+        min-width: 140px;
+    }
+}
+
+/* ============================================================
+   ACCESIBILIDAD
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .btn-comprobante {
+        transition: none;
+    }
+}

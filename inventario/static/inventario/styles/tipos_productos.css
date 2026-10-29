@@ -1,0 +1,1016 @@
+/* ============================================================
+   TIPOS DE PRODUCTO
+   Archivo: tipos_productos.css
+   Agroquímica del Valle
+============================================================ */
+
+/* ============================================================
+   BASE
+============================================================ */
+
+.pr-page {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   ENCABEZADO
+============================================================ */
+
+.pr-header {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+}
+
+.pr-header > div {
+    min-width: 0;
+}
+
+.pr-title {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #17382a;
+}
+
+/* ============================================================
+   ÍCONOS
+============================================================ */
+
+.pr-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ============================================================
+   BOTONES
+============================================================ */
+
+.pr-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 17px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background-color .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        transform .18s ease;
+}
+
+.pr-btn-primary {
+    border-color: #185a38;
+    background: #185a38;
+    color: #ffffff;
+}
+
+.pr-btn-primary:hover {
+    background: #134a2e;
+    border-color: #134a2e;
+    transform: translateY(-1px);
+}
+
+.pr-btn-claro {
+    border-color: #dce5df;
+    background: #ffffff;
+    color: #31483c;
+}
+
+.pr-btn-claro:hover {
+    background: #f4f7f5;
+    border-color: #c9d9d0;
+}
+
+.pr-btn-peligro {
+    border-color: #b91c1c;
+    background: #b91c1c;
+    color: #ffffff;
+}
+
+.pr-btn-peligro:hover {
+    background: #991b1b;
+    border-color: #991b1b;
+}
+
+/* Botón de confirmación del modal de eliminación */
+
+.pr-btn-eliminar {
+    border-color: #b42318;
+    background: #b42318;
+    color: #ffffff;
+}
+
+.pr-btn-eliminar:hover {
+    border-color: #912018;
+    background: #912018;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.pr-btn:focus-visible,
+.pr-icon-btn:focus-visible,
+.pr-modal-x:focus-visible {
+    outline: 3px solid rgba(24, 90, 56, .25);
+    outline-offset: 2px;
+}
+
+.pr-btn-eliminar:focus-visible {
+    outline-color: rgba(180, 35, 24, .25);
+}
+
+/* ============================================================
+   BÚSQUEDA Y FILTROS
+============================================================ */
+
+.pr-filtros {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin: 0 0 18px;
+}
+
+.pr-search {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.pr-search .pr-icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    color: #7b8b83;
+    pointer-events: none;
+}
+
+.pr-search input {
+    width: 100%;
+    height: 46px;
+    padding: 0 13px 0 40px;
+    box-sizing: border-box;
+    border: 1px solid #e1e9e4;
+    border-radius: 10px;
+    outline: none;
+    background: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: #24362d;
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.pr-search input::placeholder {
+    color: #9aa9a1;
+}
+
+.pr-search input:focus {
+    border-color: #79ad8d;
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, .09);
+}
+
+.pr-select {
+    height: 46px;
+    min-width: 170px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 1px solid #e1e9e4;
+    border-radius: 10px;
+    outline: none;
+    background: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: #24362d;
+    cursor: pointer;
+}
+
+.pr-select:focus {
+    border-color: #79ad8d;
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, .09);
+}
+
+/* ============================================================
+   CONTENEDOR DE LA TABLA
+============================================================ */
+
+.pr-card {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e1e9e4;
+    border-radius: 12px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.pr-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================================
+   TABLA
+============================================================ */
+
+.pr-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pr-table th {
+    padding: 14px 18px;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid #e1e9e4;
+    background: #fafcfb;
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #718279;
+}
+
+.pr-table td {
+    padding: 16px 18px;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf2ef;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #34483d;
+}
+
+.pr-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.pr-table tbody tr {
+    transition: background-color .15s ease;
+}
+
+.pr-table tbody tr:hover {
+    background: #fafcfb;
+}
+
+/* Filas de tipos inactivos */
+
+.pr-table tbody tr.inactivo td {
+    color: #7b8b83;
+}
+
+.pr-table tbody tr.inactivo .pr-nombre {
+    color: #65756c;
+}
+
+.pr-table tbody tr.inactivo .pr-estado {
+    opacity: 1;
+}
+
+.pr-vacio {
+    padding: 40px 16px !important;
+    text-align: center;
+    color: #7b8b83 !important;
+    font-size: 12.5px;
+}
+
+/* ============================================================
+   CELDA DEL TIPO: ÍCONO Y NOMBRE
+============================================================ */
+
+.pr-prod {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 180px;
+}
+
+.pr-prod-icono {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #f6ede3;
+    color: #a86a35;
+}
+
+.pr-prod-icono .pr-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.pr-table tr.inactivo .pr-prod-icono {
+    background: #eef1ef;
+    color: #7b8a82;
+}
+
+.pr-nombre {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #173d2b;
+    overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   ESTADO ACTIVO / INACTIVO
+============================================================ */
+
+.pr-estado {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 26px;
+    padding: 4px 11px;
+    box-sizing: border-box;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pr-estado::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.pr-estado-activo {
+    background: #e8f5ee;
+    color: #1b7a4a;
+}
+
+.pr-estado-inactivo {
+    background: #fff4df;
+    color: #9a6700;
+}
+
+/* Compatibilidad con clases anteriores */
+
+.pr-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 24px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pr-badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.pr-activo {
+    background: #e8f5ee;
+    color: #1b7a4a;
+}
+
+.pr-inactivo {
+    background: #eef1ef;
+    color: #7b8a82;
+}
+
+/* ============================================================
+   ACCIONES
+============================================================ */
+
+.pr-acciones {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.pr-form-estado {
+    display: flex;
+    margin: 0;
+}
+
+.pr-icon-btn {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #334b3e;
+    cursor: pointer;
+    transition:
+        background-color .15s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
+
+.pr-icon-btn .pr-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.pr-icon-btn:hover {
+    background: #f2f7f4;
+    border-color: #c9d9d0;
+}
+
+.pr-icon-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* Botón de eliminar */
+
+.pr-icon-btn.pr-baja {
+    background: #fff5f5;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.pr-icon-btn.pr-baja:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* Botón de activar, si se utiliza */
+
+.pr-icon-btn.pr-activar {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #15803d;
+}
+
+.pr-icon-btn.pr-activar:hover {
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
+/* ============================================================
+   PIE DE TABLA
+============================================================ */
+
+.pr-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 18px;
+    border-top: 1px solid #e1e9e4;
+    background: #fafcfb;
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    color: #718279;
+}
+
+/* ============================================================
+   MENSAJES TOAST
+============================================================ */
+
+.pr-toasts {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 5000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.pr-toast {
+    min-width: 260px;
+    max-width: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 15px;
+    box-sizing: border-box;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .10);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #31483c;
+    animation: prToastEntrada .20s ease-out;
+    pointer-events: auto;
+}
+
+.pr-toast.success {
+    background: #edf8f1;
+    border-color: #b8dfc5;
+    color: #17643b;
+}
+
+.pr-toast.warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.pr-toast.error {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.pr-toast-x {
+    flex-shrink: 0;
+    padding: 2px 4px;
+    border: 0;
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+@keyframes prToastEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   MODALES GENERALES
+============================================================ */
+
+.pr-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: rgba(15, 42, 29, .50);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.pr-modal[style*="display: flex"] {
+    display: flex;
+}
+
+.pr-modal-box {
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .25);
+    animation: prModalEntrada .20s ease-out;
+}
+
+.pr-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 22px;
+    border-bottom: 1px solid #e1e9e4;
+}
+
+.pr-modal-head h2 {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #20392c;
+}
+
+.pr-modal-x {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #7b8b83;
+    cursor: pointer;
+    transition:
+        background-color .15s ease,
+        color .15s ease;
+}
+
+.pr-modal-x:hover {
+    background: #f1f5f3;
+    color: #263d31;
+}
+
+.pr-modal-body {
+    padding: 22px 22px 8px;
+}
+
+.pr-modal-pie {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    padding: 16px 22px;
+    border-top: 1px solid #e1e9e4;
+}
+
+@keyframes prModalEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   FORMULARIOS DE LOS MODALES
+============================================================ */
+
+.pr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.pr-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.pr-grupo.pr-full {
+    grid-column: 1 / -1;
+}
+
+.pr-grupo label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #2d4638;
+}
+
+.pr-grupo input,
+.pr-grupo select {
+    width: 100%;
+    height: 39px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: #263b30;
+}
+
+.pr-grupo input:focus,
+.pr-grupo select:focus {
+    border-color: #6da982;
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, .10);
+}
+
+.pr-grupo input[readonly] {
+    background: #f7f9f8;
+    color: #718279;
+}
+
+/* ============================================================
+   AVISO Y RESUMEN
+============================================================ */
+
+.pr-aviso {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-bottom: 16px;
+    padding: 11px 13px;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    background: #fffbeb;
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #92400e;
+}
+
+.pr-resumen {
+    margin-bottom: 14px;
+    border: 1px solid #e1e9e4;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.pr-resumen-cab {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 14px;
+    border-bottom: 1px solid #edf2ef;
+    background: #fafcfb;
+}
+
+.pr-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #f6ede3;
+    color: #a86a35;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.pr-resumen-cab h4 {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #173d2b;
+    overflow-wrap: anywhere;
+}
+
+.pr-resumen-cab p {
+    margin: 4px 0 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    color: #718279;
+}
+
+.pr-resumen-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 4px 14px 14px;
+}
+
+.pr-dato {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    padding: 11px 7px;
+}
+
+.pr-dato .lbl {
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #718279;
+}
+
+.pr-dato .val {
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #34483d;
+    overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   MODAL DE ELIMINACIÓN
+============================================================ */
+
+.pr-modal-eliminar-box {
+    max-width: 460px;
+}
+
+/* Cuerpo de la confirmación */
+
+.pr-eliminar-body {
+    text-align: center;
+    padding: 26px 24px 24px;
+}
+
+/* Círculo rojo con signo de advertencia */
+
+.pr-eliminar-icono {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 1px solid #fecdca;
+    border-radius: 50%;
+    background: #fee4e2;
+    color: #b42318;
+}
+
+.pr-eliminar-icono .pr-icon {
+    width: 32px;
+    height: 32px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Pregunta de confirmación */
+
+.pr-eliminar-mensaje {
+    margin: 0 0 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.65;
+    color: #26352c;
+    overflow-wrap: anywhere;
+}
+
+/* Advertencia */
+
+.pr-eliminar-advertencia {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #b42318;
+}
+
+/* Pie del modal de eliminación */
+
+#modalEliminarTipo .pr-modal-pie {
+    padding: 16px 22px 20px;
+    gap: 10px;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 800px) {
+    .pr-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .pr-header .pr-btn {
+        max-width: 100%;
+    }
+
+    .pr-filtros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pr-search,
+    .pr-select {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .pr-title {
+        font-size: 24px;
+    }
+
+    .pr-grid,
+    .pr-resumen-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pr-modal {
+        padding: 12px;
+    }
+
+    .pr-modal-box {
+        max-height: 94vh;
+    }
+
+    .pr-modal-head,
+    .pr-modal-body {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .pr-modal-pie {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        padding: 14px 16px;
+    }
+
+    .pr-modal-pie .pr-btn {
+        width: 100%;
+    }
+
+    /* Modal de eliminación en celulares */
+
+    .pr-modal-eliminar-box {
+        width: 100%;
+        max-width: 460px;
+    }
+
+    .pr-eliminar-body {
+        padding-top: 22px;
+        padding-bottom: 22px;
+    }
+
+    .pr-eliminar-icono {
+        width: 58px;
+        height: 58px;
+        margin-bottom: 17px;
+    }
+
+    .pr-eliminar-mensaje {
+        font-size: 14px;
+    }
+
+    #modalEliminarTipo .pr-modal-pie {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        padding: 14px 16px 16px;
+    }
+
+    #modalEliminarTipo .pr-modal-pie .pr-btn {
+        width: 100%;
+    }
+
+    .pr-toasts {
+        right: 12px;
+        left: 12px;
+        bottom: 12px;
+    }
+
+    .pr-toast {
+        min-width: 0;
+        width: 100%;
+        max-width: none;
+    }
+
+    .pr-pie {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,1491 @@
+/* ============================================================
+   AGROQUÍMICA DEL VALLE
+   GESTIÓN DE REMITOS
+   Archivo: gestion_remitos.css
+============================================================ */
+
+/* ============================================================
+   VARIABLES Y BASE
+============================================================ */
+
+:root {
+    --rm-verde: #185a38;
+    --rm-verde-oscuro: #134a2e;
+    --rm-verde-profundo: #0f3a24;
+    --rm-verde-claro: #eaf5ee;
+    --rm-verde-suave: #f3f8f4;
+
+    --rm-texto: #1f2937;
+    --rm-texto-secundario: #64748b;
+    --rm-borde: #e2e8e5;
+    --rm-fondo: #f7f9f8;
+    --rm-blanco: #ffffff;
+
+    --rm-rojo: #b91c1c;
+    --rm-rojo-fondo: #fef2f2;
+
+    --rm-amarillo: #a16207;
+    --rm-amarillo-fondo: #fefce8;
+
+    --rm-sombra: 0 4px 18px rgba(15, 58, 36, 0.06);
+
+    --rm-radio: 10px;
+    --rm-transicion: 0.2s ease;
+}
+
+.rm-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 22px 24px 30px;
+    box-sizing: border-box;
+    color: var(--rm-texto);
+    font-family: 'Inter', 'Poppins', sans-serif;
+}
+
+.rm-page *,
+.rm-page *::before,
+.rm-page *::after {
+    box-sizing: border-box;
+}
+
+.rm-page button,
+.rm-page input,
+.rm-page select {
+    font: inherit;
+}
+
+.rm-page button {
+    cursor: pointer;
+}
+
+.rm-page svg {
+    display: block;
+}
+
+/* ============================================================
+   ICONOS
+============================================================ */
+
+.rm-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ============================================================
+   ENCABEZADO
+============================================================ */
+
+.rm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 19px;
+}
+
+.rm-title {
+    margin: 0;
+    color: var(--rm-verde-profundo);
+    font-size: 24px;
+    font-weight: 750;
+    letter-spacing: -0.6px;
+    line-height: 1.3;
+}
+
+.rm-subtitle {
+    margin: 5px 0 0;
+    color: var(--rm-texto-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   BOTONES
+============================================================ */
+
+.rm-btn {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.3;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        background var(--rm-transicion),
+        border-color var(--rm-transicion),
+        color var(--rm-transicion),
+        box-shadow var(--rm-transicion),
+        transform var(--rm-transicion);
+}
+
+.rm-btn .rm-icon {
+    width: 15px;
+    height: 15px;
+}
+
+.rm-btn-primary {
+    background: var(--rm-verde);
+    color: var(--rm-blanco);
+    box-shadow: 0 3px 8px rgba(24, 90, 56, 0.13);
+}
+
+.rm-btn-primary:hover {
+    background: var(--rm-verde-oscuro);
+    box-shadow: 0 4px 10px rgba(24, 90, 56, 0.16);
+    transform: translateY(-1px);
+}
+
+.rm-btn-secondary {
+    background: var(--rm-verde-claro);
+    color: var(--rm-verde-oscuro);
+    border-color: #cce4d3;
+}
+
+.rm-btn-secondary:hover {
+    background: #dcefe2;
+    border-color: #afd4bb;
+}
+
+.rm-btn-light {
+    background: var(--rm-blanco);
+    color: #475569;
+    border-color: #dbe3df;
+}
+
+.rm-btn-light:hover {
+    background: #f8faf9;
+    border-color: #b9c8bf;
+}
+
+.rm-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    transform: none;
+    box-shadow: none;
+}
+
+.rm-btn:focus-visible,
+.rm-icon-btn:focus-visible,
+.rm-modal-x:focus-visible,
+.rm-lote-quitar:focus-visible {
+    outline: 3px solid rgba(24, 90, 56, 0.22);
+    outline-offset: 2px;
+}
+
+/* ============================================================
+   BARRA DE RESUMEN
+============================================================ */
+
+.rm-barra {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    padding: 11px 16px;
+    margin-bottom: 17px;
+    background: var(--rm-blanco);
+    border: 1px solid var(--rm-borde);
+    border-radius: var(--rm-radio);
+    box-shadow: var(--rm-sombra);
+}
+
+.rm-barra-datos {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 22px;
+    width: 100%;
+}
+
+.rm-barra-dato {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--rm-texto-secundario);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.rm-barra-dato .rm-icon {
+    width: 17px;
+    height: 17px;
+    color: var(--rm-verde);
+}
+
+.rm-barra-dato strong {
+    color: var(--rm-verde-profundo);
+    font-size: 15px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   BÚSQUEDA Y FILTROS
+============================================================ */
+
+.rm-filtros {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.rm-search {
+    position: relative;
+    flex: 1 1 280px;
+    min-width: 200px;
+}
+
+.rm-search > .rm-icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.rm-search input {
+    width: 100%;
+    height: 37px;
+    padding: 0 12px 0 36px;
+    background: var(--rm-blanco);
+    color: var(--rm-texto);
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    outline: none;
+    font-size: 12px;
+    transition:
+        border-color var(--rm-transicion),
+        box-shadow var(--rm-transicion);
+}
+
+.rm-search input::placeholder {
+    color: #9aa6a0;
+}
+
+.rm-search input:focus,
+.rm-select:focus {
+    border-color: var(--rm-verde);
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, 0.09);
+}
+
+.rm-select {
+    min-width: 190px;
+    height: 37px;
+    padding: 0 30px 0 11px;
+    background-color: var(--rm-blanco);
+    color: #475569;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    outline: none;
+    font-size: 12px;
+    cursor: pointer;
+    transition:
+        border-color var(--rm-transicion),
+        box-shadow var(--rm-transicion);
+}
+
+/* ============================================================
+   TARJETA PRINCIPAL
+============================================================ */
+
+.rm-card {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    background: var(--rm-blanco);
+    border: 1px solid var(--rm-borde);
+    border-radius: var(--rm-radio);
+    box-shadow: var(--rm-sombra);
+}
+
+.rm-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #edf1ee;
+}
+
+.rm-card-header h2 {
+    margin: 0;
+    color: var(--rm-verde-profundo);
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.rm-card-header p {
+    margin: 4px 0 0;
+    color: var(--rm-texto-secundario);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   TABLAS
+============================================================ */
+
+.rm-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5cf transparent;
+}
+
+.rm-table-wrap::-webkit-scrollbar {
+    height: 7px;
+}
+
+.rm-table-wrap::-webkit-scrollbar-thumb {
+    background: #cbd5cf;
+    border-radius: 10px;
+}
+
+.rm-table {
+    width: 100%;
+    min-width: 820px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--rm-texto);
+    font-size: 12px;
+}
+
+.rm-table thead {
+    background: #f5f8f6;
+}
+
+.rm-table thead th {
+    padding: 11px 12px;
+    color: #5b6c61;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.35px;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 1px solid #e4ebe6;
+}
+
+.rm-table tbody td {
+    padding: 10px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf1ee;
+}
+
+.rm-table tbody tr:last-child > td {
+    border-bottom: none;
+}
+
+.rm-table tbody tr.rm-fila-remito {
+    transition: background var(--rm-transicion);
+}
+
+.rm-table tbody tr.rm-fila-remito:hover {
+    background: #f8fbf9;
+}
+
+.rm-table tbody tr.rm-fila-remito:hover > td {
+    border-bottom-color: #e1ebe4;
+}
+
+/* ============================================================
+   DATOS DEL REMITO
+============================================================ */
+
+.rm-codigo {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 7px;
+    background: #f0f5f1;
+    color: #42634e;
+    border: 1px solid #e0eae2;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.rm-numero {
+    color: var(--rm-verde-profundo);
+    font-size: 12px;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+.rm-proveedor {
+    color: #334155;
+    font-weight: 600;
+}
+
+.rm-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 8px;
+    background: var(--rm-verde-claro);
+    color: var(--rm-verde-oscuro);
+    border: 1px solid #d8eadc;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   ACCIONES DE LA TABLA
+============================================================ */
+
+.rm-acciones {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.rm-icon-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #64748b;
+    background: var(--rm-blanco);
+    border: 1px solid #e0e7e2;
+    border-radius: 7px;
+    transition:
+        color var(--rm-transicion),
+        background var(--rm-transicion),
+        border-color var(--rm-transicion),
+        transform var(--rm-transicion);
+}
+
+.rm-icon-btn .rm-icon {
+    width: 15px;
+    height: 15px;
+}
+
+.rm-icon-btn:hover {
+    transform: translateY(-1px);
+}
+
+.rm-ver:hover {
+    color: var(--rm-verde);
+    background: var(--rm-verde-claro);
+    border-color: #c8e0ce;
+}
+
+.rm-editar:hover {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+/* ============================================================
+   DETALLE DE LOTES
+============================================================ */
+
+.rm-fila-detalle > td {
+    padding: 0 !important;
+    background: #f8faf9;
+}
+
+.rm-detalle {
+    padding: 15px 17px 18px;
+    border-top: 2px solid #dce9df;
+    border-bottom: 1px solid #e1e9e3;
+}
+
+.rm-detalle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+}
+
+.rm-detalle-header h3 {
+    margin: 0;
+    color: var(--rm-verde-profundo);
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.rm-table-lotes {
+    min-width: 720px;
+    background: var(--rm-blanco);
+    border: 1px solid #e3ebe5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rm-table-lotes thead {
+    background: #edf5ef;
+}
+
+.rm-table-lotes thead th {
+    padding: 9px 10px;
+    font-size: 9px;
+}
+
+.rm-table-lotes tbody td {
+    padding: 9px 10px;
+    font-size: 11px;
+}
+
+.rm-table-lotes tbody tr:hover {
+    background: #f8fbf9;
+}
+
+/* ============================================================
+   ESTADOS DE LOS LOTES
+============================================================ */
+
+.rm-estado {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.rm-activo {
+    color: #166534;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.rm-vencido {
+    color: var(--rm-rojo);
+    background: var(--rm-rojo-fondo);
+    border-color: #fecaca;
+}
+
+.rm-agotado {
+    color: #64748b;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+}
+
+/* ============================================================
+   TABLA VACÍA
+============================================================ */
+
+.rm-vacio {
+    padding: 28px 16px !important;
+    color: #94a3b8;
+    text-align: center;
+    font-size: 12px;
+}
+
+/* ============================================================
+   PIE DE TABLA
+============================================================ */
+
+.rm-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 11px 16px;
+    background: #fcfdfc;
+    border-top: 1px solid #edf1ee;
+    color: #849188;
+    font-size: 11px;
+}
+
+.rm-pie span:first-child {
+    color: #5b6c61;
+    font-weight: 600;
+}
+
+/* ============================================================
+   MENSAJES / TOASTS
+============================================================ */
+
+.rm-toasts {
+    position: fixed;
+    top: 18px;
+    right: 20px;
+    z-index: 12000;
+    width: min(370px, calc(100vw - 32px));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.rm-toast {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 13px;
+    color: #166534;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #16a34a;
+    border-radius: 9px;
+    box-shadow: 0 8px 25px rgba(15, 58, 36, 0.12);
+    font-size: 12px;
+    line-height: 1.5;
+    pointer-events: auto;
+    animation: rm-toast-entrada 0.25s ease;
+}
+
+.rm-toast.success {
+    color: #166534;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    border-left-color: #16a34a;
+}
+
+.rm-toast.warning {
+    color: #92400e;
+    background: #fffbeb;
+    border-color: #fde68a;
+    border-left-color: #d97706;
+}
+
+.rm-toast.error,
+.rm-toast.danger {
+    color: #991b1b;
+    background: #fef2f2;
+    border-color: #fecaca;
+    border-left-color: #dc2626;
+}
+
+.rm-toast-x {
+    flex-shrink: 0;
+    padding: 0;
+    color: currentColor;
+    background: transparent;
+    border: none;
+    font-size: 15px;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.rm-toast-x:hover {
+    opacity: 1;
+}
+
+@keyframes rm-toast-entrada {
+    from {
+        opacity: 0;
+        transform: translateX(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ============================================================
+   MODALES GENERALES
+============================================================ */
+
+.rm-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 11000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(15, 35, 24, 0.55);
+    backdrop-filter: blur(3px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+    animation: rm-fondo-entrada 0.18s ease;
+}
+
+.rm-modal-box {
+    width: 100%;
+    max-width: 530px;
+    height: auto;
+    max-height: calc(100vh - 36px);
+    max-height: calc(100dvh - 36px);
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+    background: var(--rm-blanco);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 12px;
+    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.22);
+
+    animation: rm-modal-entrada 0.22s ease;
+}
+
+.rm-modal-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 16px 19px;
+    background: #fbfdfb;
+    border-bottom: 1px solid #e9efeb;
+}
+
+.rm-modal-head h2 {
+    margin: 0;
+    color: var(--rm-verde-profundo);
+    font-size: 17px;
+    font-weight: 750;
+    letter-spacing: -0.2px;
+}
+
+.rm-modal-head p {
+    margin: 5px 0 0;
+    color: var(--rm-texto-secundario);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.rm-modal-x {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #64748b;
+    background: var(--rm-blanco);
+    border: 1px solid #e2e8e5;
+    border-radius: 7px;
+    font-size: 16px;
+    transition:
+        color var(--rm-transicion),
+        background var(--rm-transicion);
+}
+
+.rm-modal-x:hover {
+    color: var(--rm-rojo);
+    background: #fef2f2;
+}
+
+/*
+   CORRECCIÓN DEL SCROLL:
+   En el HTML, el <form> envuelve el cuerpo y el pie del modal, por lo que
+   es el hijo directo de .rm-modal-box. Para que .rm-modal-body pueda
+   encogerse y desplazarse, el <form> debe continuar la cadena flex:
+   - ocupa el espacio disponible (flex: 1 1 auto) y puede achicarse (min-height: 0)
+   - es un contenedor flex en columna
+   Así el encabezado queda fijo arriba, el pie fijo abajo y solo se
+   desplaza el cuerpo.
+*/
+.rm-modal-box > form {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rm-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    padding: 18px 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5cf transparent;
+}
+
+.rm-modal-body::-webkit-scrollbar {
+    width: 7px;
+}
+
+.rm-modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5cf;
+    border-radius: 10px;
+}
+
+.rm-modal-pie {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 19px;
+    background: #fbfdfb;
+    border-top: 1px solid #e9efeb;
+}
+
+@keyframes rm-fondo-entrada {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes rm-modal-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.99);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ============================================================
+   FORMULARIOS DE LOS MODALES
+============================================================ */
+
+.rm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px 14px;
+}
+
+.rm-grupo {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rm-full {
+    grid-column: 1 / -1;
+}
+
+.rm-grupo label {
+    color: #374151;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.rm-grupo input,
+.rm-grupo select {
+    width: 100%;
+    min-width: 0;
+    height: 37px;
+    padding: 0 10px;
+    color: var(--rm-texto);
+    background: var(--rm-blanco);
+    border: 1px solid #dce5df;
+    border-radius: 7px;
+    outline: none;
+    font-size: 12px;
+    transition:
+        border-color var(--rm-transicion),
+        box-shadow var(--rm-transicion);
+}
+
+.rm-grupo input::placeholder {
+    color: #a0aaa4;
+}
+
+.rm-grupo input:focus,
+.rm-grupo select:focus {
+    border-color: var(--rm-verde);
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, 0.09);
+}
+
+.rm-grupo input[type="date"] {
+    color-scheme: light;
+}
+
+.rm-grupo small,
+.rm-ayuda {
+    color: var(--rm-texto-secundario);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.rm-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 12px;
+    color: #476451;
+    background: #f1f8f3;
+    border: 1px solid #d9eadf;
+    border-radius: 8px;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.rm-info .rm-icon {
+    width: 15px;
+    height: 15px;
+    margin-top: 1px;
+    color: var(--rm-verde);
+}
+
+/* ============================================================
+   MODAL: REGISTRO DE REMITOS Y LOTES
+============================================================ */
+
+#modalCrearRemito.rm-modal {
+    padding: 18px;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+}
+
+/*
+   El modal se adapta a la cantidad de espacio disponible.
+   El encabezado y el pie quedan fijos.
+   Solo se desplaza el contenido central.
+*/
+
+#modalCrearRemito .rm-modal-box-lotes {
+    width: min(800px, 100%);
+    max-width: 800px;
+    height: auto;
+    max-height: calc(100vh - 36px);
+    max-height: calc(100dvh - 36px);
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    border-radius: 13px;
+    background: var(--rm-blanco);
+}
+
+#modalCrearRemito .rm-modal-head {
+    flex: 0 0 auto;
+}
+
+/* Área desplazable del formulario y de los lotes */
+
+#modalCrearRemito .rm-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    padding: 18px 20px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5cf transparent;
+}
+
+#modalCrearRemito .rm-modal-body::-webkit-scrollbar {
+    width: 7px;
+}
+
+#modalCrearRemito .rm-modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5cf;
+    border-radius: 10px;
+}
+
+#modalCrearRemito .rm-modal-pie {
+    flex: 0 0 auto;
+}
+
+/* Introducción */
+
+#modalCrearRemito .rm-modal-intro {
+    margin: 0 0 15px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Campos en dos columnas */
+
+#modalCrearRemito .rm-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px 14px;
+}
+
+#modalCrearRemito .rm-grupo {
+    min-width: 0;
+    gap: 6px;
+}
+
+#modalCrearRemito .rm-grupo.rm-full {
+    grid-column: 1 / -1;
+}
+
+/* Etiquetas */
+
+#modalCrearRemito .rm-grupo label {
+    color: #24382c;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+/* Campos de texto y desplegables */
+
+#modalCrearRemito .rm-grupo input,
+#modalCrearRemito .rm-grupo select {
+    width: 100%;
+    min-width: 0;
+    height: 39px;
+    padding: 0 11px;
+    border: 1px solid #d5e0d8;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #1f2937;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+#modalCrearRemito .rm-grupo input:focus,
+#modalCrearRemito .rm-grupo select:focus {
+    outline: none;
+    border-color: var(--rm-verde);
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, 0.12);
+}
+
+/* Mensajes de ayuda */
+
+#modalCrearRemito .rm-grupo small,
+#modalCrearRemito .rm-ayuda {
+    color: #64748b;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   SECCIÓN DE LOTES
+============================================================ */
+
+#modalCrearRemito .rm-lotes-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 19px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8e5;
+}
+
+#modalCrearRemito .rm-lotes-cab h3 {
+    margin: 0 0 5px;
+    color: var(--rm-verde-oscuro);
+    font-size: 14px;
+    font-weight: 750;
+}
+
+#modalCrearRemito .rm-lotes-cab p {
+    max-width: 520px;
+    margin: 0;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* Tarjeta individual de cada lote */
+
+#modalCrearRemito .rm-lote {
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 10px;
+    padding: 14px;
+    border: 1px solid #dce7df;
+    border-radius: 10px;
+    background: #f8faf8;
+    transition:
+        border-color var(--rm-transicion),
+        box-shadow var(--rm-transicion);
+}
+
+#modalCrearRemito .rm-lote:last-child {
+    margin-bottom: 0;
+}
+
+#modalCrearRemito .rm-lote:focus-within {
+    border-color: #b8d4c0;
+    box-shadow: 0 0 0 2px rgba(24, 90, 56, 0.05);
+}
+
+/*
+   CORRECCIÓN DEL ESPACIADO:
+   El campo "Producto" es un .rm-grupo suelto dentro de .rm-lote (queda
+   fuera del .rm-grid), por eso no recibía separación con la fila siguiente.
+*/
+#modalCrearRemito .rm-lote > .rm-grupo {
+    margin-bottom: 13px;
+}
+
+/* Encabezado de la tarjeta del lote */
+
+#modalCrearRemito .rm-lote-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+#modalCrearRemito .rm-lote-titulo {
+    color: var(--rm-verde);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+/* Botón para quitar un lote */
+
+#modalCrearRemito .rm-lote-quitar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 5px;
+    min-height: 29px;
+    padding: 6px 9px;
+    color: #b91c1c;
+    background: #ffffff;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    transition:
+        background var(--rm-transicion),
+        border-color var(--rm-transicion),
+        color var(--rm-transicion);
+}
+
+#modalCrearRemito .rm-lote-quitar:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+/* Mensaje de validación */
+
+#modalCrearRemito .rm-error {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Pie de acciones del modal */
+
+#modalCrearRemito .rm-modal-pie {
+    gap: 9px;
+    padding: 12px 20px;
+    border-top: 1px solid #e2e8e5;
+    background: #fbfdfb;
+}
+
+/* ============================================================
+   BOTÓN PEQUEÑO
+============================================================ */
+
+.rm-btn-chico {
+    min-height: 31px;
+    padding: 6px 10px;
+    font-size: 11px;
+}
+
+/* ============================================================
+   RESPONSIVE: TABLETS
+============================================================ */
+
+@media (max-width: 1000px) {
+    .rm-page {
+        padding: 20px 18px 26px;
+    }
+
+    .rm-title {
+        font-size: 22px;
+    }
+
+    .rm-barra-datos {
+        gap: 16px;
+    }
+
+    .rm-filtros {
+        gap: 9px;
+    }
+
+    .rm-search {
+        flex-basis: 100%;
+    }
+
+    .rm-select {
+        flex: 1 1 190px;
+    }
+
+    #modalCrearRemito .rm-modal-box-lotes {
+        width: min(760px, 100%);
+        max-width: 760px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE: CELULARES
+============================================================ */
+
+@media (max-width: 600px) {
+    .rm-page {
+        padding: 16px 11px 22px;
+    }
+
+    .rm-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+
+    .rm-header > .rm-btn {
+        width: 100%;
+    }
+
+    .rm-title {
+        font-size: 21px;
+    }
+
+    .rm-subtitle {
+        font-size: 11px;
+    }
+
+    .rm-barra {
+        padding: 12px;
+    }
+
+    .rm-barra-datos {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 11px;
+    }
+
+    .rm-barra-dato {
+        font-size: 11px;
+    }
+
+    .rm-barra-dato strong {
+        font-size: 14px;
+    }
+
+    .rm-filtros {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .rm-search,
+    .rm-select,
+    .rm-filtros > .rm-btn {
+        width: 100%;
+        min-width: 0;
+        flex-basis: auto;
+    }
+
+    .rm-card-header {
+        padding: 13px 12px;
+    }
+
+    .rm-card-header h2 {
+        font-size: 13px;
+    }
+
+    .rm-table {
+        font-size: 11px;
+    }
+
+    .rm-table thead th,
+    .rm-table tbody td {
+        padding: 9px 10px;
+    }
+
+    .rm-pie {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 11px 12px;
+    }
+
+    .rm-detalle {
+        padding: 13px 10px 16px;
+    }
+
+    .rm-detalle-header h3 {
+        font-size: 12px;
+    }
+
+    /* Modales generales */
+
+    .rm-modal {
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .rm-modal-box {
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+        border-radius: 10px;
+    }
+
+    .rm-modal-head {
+        padding: 14px;
+    }
+
+    .rm-modal-head h2 {
+        font-size: 16px;
+    }
+
+    .rm-modal-body {
+        padding: 15px 14px;
+    }
+
+    .rm-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .rm-full {
+        grid-column: auto;
+    }
+
+    .rm-modal-pie {
+        padding: 11px 14px;
+    }
+
+    .rm-modal-pie .rm-btn {
+        flex: 1;
+    }
+
+    /* Notificaciones */
+
+    .rm-toasts {
+        top: 10px;
+        right: 10px;
+        width: calc(100vw - 20px);
+    }
+
+    /* Modal de registro de remitos */
+
+    #modalCrearRemito.rm-modal {
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        overflow: hidden;
+    }
+
+    #modalCrearRemito .rm-modal-box-lotes {
+        width: 100%;
+        max-width: none;
+        height: auto;
+        max-height: calc(100vh - 16px);
+        max-height: calc(100dvh - 16px);
+        min-height: 0;
+        margin: 0;
+        border-radius: 10px;
+    }
+
+    #modalCrearRemito .rm-modal-head {
+        flex: 0 0 auto;
+        padding: 13px;
+    }
+
+    #modalCrearRemito .rm-modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        min-width: 0;
+        padding: 14px 12px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #modalCrearRemito .rm-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    #modalCrearRemito .rm-grupo.rm-full {
+        grid-column: auto;
+    }
+
+    #modalCrearRemito .rm-lotes-cab {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+        margin-top: 15px;
+        padding-top: 13px;
+    }
+
+    #modalCrearRemito .rm-lote {
+        padding: 12px;
+    }
+
+    #modalCrearRemito .rm-lote-top {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 11px;
+    }
+
+    #modalCrearRemito .rm-modal-pie {
+        flex: 0 0 auto;
+        padding: 11px 12px;
+    }
+
+    #modalCrearRemito .rm-modal-pie .rm-btn {
+        flex: 1 1 auto;
+        white-space: normal;
+    }
+}
+
+/* ============================================================
+   ACCESIBILIDAD: REDUCIR ANIMACIONES
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-page *,
+    .rm-page *::before,
+    .rm-page *::after,
+    .rm-modal,
+    .rm-modal-box,
+    .rm-toast {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
