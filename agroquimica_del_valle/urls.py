@@ -1,7 +1,11 @@
-from django.urls import path
+from django.urls import path, include
 from inventario import views
 
 urlpatterns = [
+
+    # API para React
+    path('api/', include('inventario.api_urls')),
+
     # Login
     path('', views.login_view, name='login'),
     path('login/', views.login_view, name='login'),

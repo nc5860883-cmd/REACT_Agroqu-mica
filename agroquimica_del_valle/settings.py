@@ -37,6 +37,8 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.trycloudflare.com',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
 ]
 
 
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'inventario',
 ]
 
@@ -143,4 +146,12 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+}
+
+# API para React
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ["inventario.api_auth.SesionUsuarioAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["inventario.api_auth.UsuarioLogueado"],
+    "EXCEPTION_HANDLER": "inventario.api.manejar_errores",
+    "UNAUTHENTICATED_USER": None,
 }
