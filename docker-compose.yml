@@ -1,26 +1,28 @@
-version: '3.8'
+# Cada valor puede cambiarse en el archivo .env.
+# Si no está definido ahí, se usa el valor que va después de ":-",
+# que es la configuración original del proyecto.
 
 services:
   db:
-    image: mysql:latest  # <-- Cambiado a latest (instala la versión 8.4+)
-    container_name: mysql_bd
+    image: mysql:latest
+    container_name: ${DB_CONTAINER:-mysql_bd}
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mi_proyecto_db
-      MYSQL_USER: usuario_django
-      MYSQL_PASSWORD: django_password
+      MYSQL_DATABASE: ${DB_NAME:-mi_proyecto_db}
+      MYSQL_USER: ${DB_USER:-usuario_django}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-django_password}
     ports:
-      - "3307:3306"
+      - "${DB_PORT:-3307}:3306"
     volumes:
       - db_data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin_gui
+    container_name: ${PMA_CONTAINER:-phpmyadmin_gui}
     restart: always
     ports:
-      - "8080:80"
+      - "${PMA_PORT:-8080}:80"
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -29,5 +31,5 @@ services:
 
 volumes:
   db_data:
-    name: agroquimica_db_data
+    name: ${DB_VOLUME:-agroquimica_db_data}
     external: true
