@@ -1,0 +1,730 @@
+/* ============================================================
+   PRODUCTOS  ·  Agroquímicos del Valle
+   Estilos de productos.html.
+   Todas las clases empiezan con "pr-" para no pisar los estilos de base.css.
+   Ubicación: inventario/static/inventario/styles/productos.css
+   ============================================================ */
+
+/* Las variables se declaran para la página, los modales y las notificaciones
+   (los modales están fuera del contenedor .pr-page). */
+.pr-page,
+.pr-modal,
+.pr-toasts {
+    --pr-verde:        #185a38;
+    --pr-verde-hover:  #134a2e;
+    --pr-titulo:       #0f3a24;
+    --pr-borde:        #e3eae6;
+    --pr-borde-campo:  #dde7e0;
+    --pr-texto:        #1c2a23;
+    --pr-suave:        #6b7c73;
+    --pr-rojo:         #b91c1c;
+
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--pr-texto);
+}
+
+.pr-page *,
+.pr-modal,
+.pr-modal *,
+.pr-modal *::before,
+.pr-modal *::after {
+    box-sizing: border-box;
+}
+
+.pr-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* ---------- ENCABEZADO ---------- */
+.pr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.pr-eyebrow {
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--pr-suave);
+    margin-bottom: 8px;
+}
+
+.pr-title {
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    color: var(--pr-texto);
+    margin: 0 0 6px;
+}
+
+.pr-sub {
+    font-size: 13px;
+    color: var(--pr-suave);
+    margin: 0;
+}
+
+
+/* ---------- BOTONES ---------- */
+.pr-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s;
+}
+
+.pr-btn-primary       { background: var(--pr-verde); color: #fff; }
+.pr-btn-primary:hover { background: var(--pr-verde-hover); }
+
+.pr-btn-claro         { background: #fff; color: var(--pr-texto); border-color: var(--pr-borde-campo); }
+.pr-btn-claro:hover   { background: #f4f7f5; }
+
+.pr-btn-peligro       { background: var(--pr-rojo); color: #fff; }
+.pr-btn-peligro:hover { background: #991b1b; }
+
+
+/* ---------- PESTAÑAS (Tipos de producto | Subtipos) ---------- */
+.pr-tabs {
+    display: flex;
+    gap: 26px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--pr-borde);
+}
+
+.pr-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 2px 12px;
+    margin-bottom: -1px;
+    font-size: 13px;
+    color: var(--pr-suave);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color .15s;
+}
+
+.pr-tab:hover { color: var(--pr-texto); }
+
+.pr-tab.activa {
+    color: var(--pr-verde);
+    font-weight: 600;
+    border-bottom-color: var(--pr-verde);
+}
+
+.pr-contador {
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: #eef2ef;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--pr-suave);
+}
+
+.pr-tab.activa .pr-contador { background: #e2f0e8; color: var(--pr-verde); }
+
+
+/* ---------- BÚSQUEDA ---------- */
+.pr-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 0 14px;
+    background: #fff;
+    border: 1px solid var(--pr-borde);
+    border-radius: 10px;
+    color: var(--pr-suave);
+}
+
+.pr-search:focus-within { border-color: #86c5a1; box-shadow: 0 0 0 3px rgba(24, 90, 56, .12); }
+
+.pr-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 13px 0;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--pr-texto);
+}
+
+
+/* ---------- TABLA ---------- */
+.pr-card {
+    background: #fff;
+    border: 1px solid var(--pr-borde);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.pr-table-wrap { overflow-x: auto; }
+
+.pr-table { width: 100%; border-collapse: collapse; }
+
+.pr-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--pr-suave);
+    background: #fafcfb;
+    border-bottom: 1px solid var(--pr-borde);
+    white-space: nowrap;
+}
+
+.pr-table td {
+    padding: 14px 16px;
+    font-size: 12.5px;
+    border-bottom: 1px solid #eef3f0;
+    vertical-align: middle;
+}
+
+.pr-table tbody tr:last-child td { border-bottom: none; }
+.pr-table tbody tr:hover         { background: #f9fbfa; }
+
+.pr-table tr.inactivo .pr-nombre { color: var(--pr-suave); }
+
+.pr-nombre { font-weight: 700; color: var(--pr-titulo); }
+.pr-muted  { color: var(--pr-suave); }
+
+.pr-vacio {
+    text-align: center;
+    padding: 40px 16px !important;
+    color: var(--pr-suave);
+}
+
+.pr-pie {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 11px;
+    color: var(--pr-suave);
+    border-top: 1px solid var(--pr-borde);
+    background: #fafcfb;
+}
+
+
+/* ---------- ESTADO ---------- */
+.pr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pr-badge::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.pr-activo   { background: #e8f5ee; color: #1b7a4a; }
+.pr-inactivo { background: #eef1ef; color: #7b8a82; }
+
+
+/* ---------- ACCIONES DE LA TABLA ---------- */
+.pr-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pr-acciones form { display: inline; margin: 0; }
+
+.pr-accion {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    background: #fff;
+    border: 1px solid var(--pr-borde-campo);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2d4739;
+    cursor: pointer;
+    transition: background-color .15s;
+}
+
+.pr-accion:hover { background: #f1f5f3; }
+
+.pr-baja         { color: #3f5a4c; }
+.pr-baja:hover   { background: #fef2f2; border-color: #fecaca; color: var(--pr-rojo); }
+
+.pr-activar        { color: #15803d; border-color: #bbf7d0; background: #f0fdf4; }
+.pr-activar:hover  { background: #dcfce7; }
+
+
+/* ---------- NOTIFICACIONES ---------- */
+.pr-toasts {
+    position: fixed;
+    top: 84px;
+    right: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pr-toast {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    min-width: 280px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid var(--pr-borde);
+    border-left: 4px solid var(--pr-verde);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .1);
+    font-size: 12.5px;
+    animation: pr-entrada-toast .3s ease-out forwards;
+}
+
+.pr-toast.success { border-left-color: #15803d; }
+.pr-toast.warning { border-left-color: #f59f00; }
+.pr-toast.error   { border-left-color: var(--pr-rojo); }
+
+.pr-toast-x       { cursor: pointer; font-weight: 700; color: #8a9e93; }
+.pr-toast-x:hover { color: var(--pr-texto); }
+
+@keyframes pr-entrada-toast {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pr-fadeout {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(20px); }
+}
+
+
+/* ============================================================
+   MODALES
+   ============================================================ */
+.pr-modal {
+    display: none;                /* el JS lo cambia a flex */
+    position: fixed;
+    inset: 0;
+    z-index: 9999;                /* por encima del menú lateral y la barra superior */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(16, 40, 28, .45);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.pr-modal-box {
+    width: 100%;
+    max-width: 540px;
+    max-height: 92vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .3);
+    animation: pr-entrada .22s ease-out;
+}
+
+@keyframes pr-entrada {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.pr-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--pr-borde);
+}
+
+.pr-modal-head h2 {
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--pr-texto);
+    margin: 0;
+}
+
+.pr-modal-x {
+    display: inline-flex;
+    padding: 4px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: var(--pr-suave);
+    cursor: pointer;
+}
+.pr-modal-x:hover { background: #f1f5f3; color: var(--pr-texto); }
+
+.pr-modal-body { padding: 20px 22px 6px; }
+
+.pr-grupo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+
+.pr-grupo label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1f3a2c;
+}
+
+.pr-grupo input,
+.pr-grupo select {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    background: #fff;
+    border: 1px solid var(--pr-borde-campo);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12.5px;
+    color: var(--pr-texto);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.pr-grupo input::placeholder { color: #a3b0a9; }
+
+.pr-grupo input:focus,
+.pr-grupo select:focus {
+    border-color: #6fb28b;
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, .14);
+}
+
+.pr-grupo input[readonly] {
+    background: #f3f6f4;
+    color: #5c7367;
+    cursor: default;
+}
+.pr-grupo input[readonly]:focus { border-color: var(--pr-borde-campo); box-shadow: none; }
+
+.pr-modal-pie {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 22px;
+    border-top: 1px solid var(--pr-borde);
+}
+
+.pr-modal .pr-btn {
+    height: 34px;
+    padding: 0 18px;
+    font-size: 12.5px;
+}
+
+
+/* ---------- MODAL DE CONFIRMAR BAJA ---------- */
+.pr-aviso {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #991b1b;
+}
+
+.pr-resumen {
+    margin-bottom: 16px;
+    padding: 14px;
+    background: #f8faf9;
+    border: 1px solid var(--pr-borde);
+    border-radius: 10px;
+}
+
+.pr-resumen-cab {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.pr-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: #fde8e8;
+    color: #e02424;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.pr-resumen-cab h4 { font-size: 14px; color: var(--pr-texto); margin: 0; }
+.pr-resumen-cab p  { font-size: 11px; color: var(--pr-suave); margin: 2px 0 0; }
+
+.pr-resumen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.pr-dato {
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px solid #eef3f0;
+    border-radius: 6px;
+}
+
+.pr-dato .lbl {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #8a9e93;
+}
+
+.pr-dato .val {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2d4739;
+    word-break: break-word;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 700px) {
+    .pr-header { flex-direction: column; }
+    .pr-resumen-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================
+   ESPECÍFICO DE PRODUCTOS
+   ============================================================ */
+
+/* ---------- Barra de resumen ---------- */
+.pr-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 9px;
+    margin-bottom: 8px;
+    padding: 8px 20px;
+    background: #fff;
+    border: 1px solid var(--pr-borde);
+    border-radius: 12px;
+    font-size: 12px;
+    color: var(--pr-suave);
+}
+
+.pr-barra-datos { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+
+.pr-barra-dato { display: inline-flex; align-items: center; gap: 8px; }
+
+.pr-barra-dato strong { font-size: 13px; color: var(--pr-texto); }
+
+/* ---------- Búsqueda + filtros ---------- */
+.pr-filtros {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.pr-filtros .pr-search { flex: 1; margin-bottom: 0; }
+
+.pr-select {
+    min-width: 190px;
+    height: 100%;
+    padding: 14px 14px;
+    background: #fff;
+    border: 1px solid var(--pr-borde);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 12.5px;
+    color: var(--pr-texto);
+    outline: none;
+    cursor: pointer;
+}
+
+.pr-select:focus { border-color: #86c5a1; box-shadow: 0 0 0 3px rgba(24, 90, 56, .12); }
+
+/* ---------- Tabla de productos ---------- */
+.pr-table td { white-space: nowrap; }
+
+.pr-prod { display: flex; align-items: center; gap: 12px; }
+
+.pr-prod-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: #f7efe3;
+    color: #a47a45;
+}
+
+.pr-table tr.inactivo .pr-prod-icono { background: #eef1ef; color: #9aa59f; }
+
+.pr-subtipos {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: black;
+}
+
+.pr-tipo   { display: block; font-size: 12px; }
+.pr-precio {color: black; }
+
+.pr-stock       { display: block; font-size: 13px; }
+.pr-stock.pr-bajo { color: #dc2626; }
+
+.pr-minimo small { color: var(--pr-suave); font-size: 12px; }
+
+/* ---------- Botones de icono ---------- */
+.pr-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 33px;
+    height: 33px;
+    padding: 0;
+    background: #fff;
+    border: 1px solid var(--pr-borde-campo);
+    border-radius: 8px;
+    color: #3f5a4c;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s;
+}
+
+.pr-icon-btn:hover { background: #f1f5f3; }
+
+.pr-icon-btn.pr-baja         { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+.pr-icon-btn.pr-baja:hover   { background: #fee2e2; }
+
+.pr-icon-btn.pr-activar       { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+.pr-icon-btn.pr-activar:hover { background: #dcfce7; }
+
+.pr-acciones { justify-content: flex-end; }
+
+/* ---------- Formulario del modal ---------- */
+.pr-ayuda {
+    margin: 0 0 16px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--pr-suave);
+}
+
+.pr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+}
+
+.pr-full { grid-column: 1 / -1; }
+
+.pr-grupo textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid var(--pr-borde-campo);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12.5px;
+    color: var(--pr-texto);
+    outline: none;
+    resize: vertical;
+}
+
+.pr-grupo textarea:focus {
+    border-color: #6fb28b;
+    box-shadow: 0 0 0 3px rgba(24, 90, 56, .14);
+}
+
+/* Subtipos con casillas */
+.pr-subtipos-caja {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    min-height: 40px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid var(--pr-borde-campo);
+    border-radius: 8px;
+}
+
+.pr-subtipos-caja label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--pr-texto);
+    cursor: pointer;
+}
+
+.pr-subtipos-caja input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    accent-color: #185a38;
+}
+
+.pr-sub-vacio { font-size: 12px; color: var(--pr-suave); }
+
+.pr-hint { font-size: 11px; color: var(--pr-suave); }
+
+/* Cuadro verde informativo */
+.pr-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 11px 13px;
+    background: #eef7f1;
+    border: 1px solid #cfe6d8;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #1b6b44;
+}
+
+@media (max-width: 800px) {
+    .pr-filtros { flex-direction: column; }
+    .pr-select  { height: 42px; }
+    .pr-barra   { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 700px) {
+    .pr-grid { grid-template-columns: 1fr; }
+}
+
+.pr-form-estado { display: inline-flex; margin: 0; }
+
