@@ -1,3 +1,7 @@
+import time
+import time as time_module
+from datetime import datetime, date, time as datetime_time
+from django.utils.http import url_has_allowed_host_and_scheme
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
@@ -9,21 +13,27 @@ from django.http import JsonResponse
 from django.contrib.staticfiles import finders
 from django.core.paginator import Paginator
 from django.db import DatabaseError, IntegrityError, transaction
-from django.db.models import Count, Prefetch, ProtectedError, Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.urls import reverse
+
+from django.db.models import Count, Prefetch, ProtectedError, Q, Sum
+from django.db.models.functions import Coalesce
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader, simpleSplit
 from reportlab.pdfgen import canvas
-
+from .reportes import generar_reportes, datos_evolucion_rango
 from .auditoria import snapshot, registrar_auditoria
 from .forms import ProveedorForm
-from .permissions import usuario_con_acceso
+from .permissions import (
+    usuario_con_acceso, usuario_con_accion, puede, puede_accion,
+    catalogo_plano,
+)
 
 from .models import (
     TiposProductos,
@@ -145,6 +155,8 @@ def login_view(request):
             ):
 
                 request.session['usuario_id'] = usuario.ID_Usuario
+                request.session['bloqueada'] = False
+                request.session['ultima_actividad'] = time_module.time()
                 request.session['usuario_nombre'] = usuario.Usuario
                 request.session['perfil_id'] = usuario.ID_Perfil.ID_Perfil
                 request.session['perfil_nombre'] = (
@@ -321,7 +333,7 @@ def gestion_proveedores(request):
 
 def crear_proveedor(request):
 
-    usuario = usuario_con_acceso(request, 'proveedores')
+    usuario = usuario_con_acceso(request, 'proveedores', gestionar=True)
 
     if not usuario:
         messages.error(
@@ -379,7 +391,7 @@ def crear_proveedor(request):
 
 def editar_proveedor(request, pk):
 
-    usuario = usuario_con_acceso(request, 'proveedores')
+    usuario = usuario_con_acceso(request, 'proveedores', gestionar=True)
 
     if not usuario:
         messages.error(
@@ -463,7 +475,7 @@ def editar_proveedor(request, pk):
 
 def cambiar_estado_proveedor(request, pk):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'proveedores', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -729,13 +741,6 @@ def eliminar_tipo_producto(request, pk):
         )
         return redirect('panel_principal')
 
-    if not usuario_es_administrador(request):
-        messages.error(
-            request,
-            'No tenés permiso para eliminar tipos de productos.'
-        )
-        return redirect('gestion_tipos_productos')
-
     if request.method != 'POST':
         return redirect('gestion_tipos_productos')
 
@@ -850,7 +855,7 @@ def gestion_subtipos(request):
 
 def crear_subtipo(request):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'subtipos', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -933,7 +938,7 @@ def crear_subtipo(request):
 
 def editar_subtipo(request, pk):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'subtipos', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -1045,7 +1050,7 @@ def editar_subtipo(request, pk):
 def eliminar_subtipo(request, pk):
     """Elimina un subtipo solo si no tiene productos asociados."""
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'subtipos', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -1093,7 +1098,7 @@ def eliminar_subtipo(request, pk):
 
 def gestion_usuarios(request):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'usuarios')
 
     if not usuario:
         return redirect('panel_principal')
@@ -1135,7 +1140,7 @@ def gestion_usuarios(request):
 
 def crear_usuario(request):
 
-    usuario_admin = usuario_es_administrador(request)
+    usuario_admin = usuario_con_acceso(request, 'usuarios', gestionar=True)
 
     if not usuario_admin:
         return redirect('panel_principal')
@@ -1297,7 +1302,7 @@ def crear_usuario(request):
 
 def editar_usuario(request, pk):
 
-    usuario_admin = usuario_es_administrador(request)
+    usuario_admin = usuario_con_acceso(request, 'usuarios', gestionar=True)
 
     if not usuario_admin:
         return redirect('panel_principal')
@@ -1368,7 +1373,7 @@ def editar_usuario(request, pk):
 
 def dar_baja_usuario(request, pk):
 
-    usuario_admin = usuario_es_administrador(request)
+    usuario_admin = usuario_con_acceso(request, 'usuarios', gestionar=True)
 
     if not usuario_admin:
         return redirect('panel_principal')
@@ -1406,7 +1411,7 @@ def dar_baja_usuario(request, pk):
 
 def activar_usuario(request, id):
 
-    usuario_admin = usuario_es_administrador(request)
+    usuario_admin = usuario_con_acceso(request, 'usuarios', gestionar=True)
 
     if not usuario_admin:
         return redirect('panel_principal')
@@ -1444,7 +1449,7 @@ def activar_usuario(request, id):
 
 def restablecer_contrasena(request, pk):
 
-    usuario_admin = usuario_es_administrador(request)
+    usuario_admin = usuario_con_acceso(request, 'usuarios', gestionar=True)
 
     if not usuario_admin:
         return redirect('panel_principal')
@@ -1568,7 +1573,7 @@ def _snapshot_perfil(perfil):
 
 def gestion_perfiles(request):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'perfiles')
 
     if not usuario:
         return redirect('panel_principal')
@@ -1607,7 +1612,7 @@ def gestion_perfiles(request):
 
 def crear_perfil(request):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'perfiles', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -1667,7 +1672,7 @@ def crear_perfil(request):
 
 def editar_perfil(request, pk):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'perfiles', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -1747,7 +1752,7 @@ def editar_perfil(request, pk):
 
 def cambiar_estado_perfil(request, id):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'perfiles', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -1831,182 +1836,51 @@ def cambiar_estado_perfil(request, id):
 
 def gestion_permisos(request):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'permisos')
 
     if not usuario:
+        messages.error(
+            request,
+            'No tenés permiso para consultar los permisos del sistema.'
+        )
         return redirect('panel_principal')
 
     busqueda = request.GET.get('q', '').strip()
+    filtro = busqueda.lower()
 
-    permisos = Permisos.objects.prefetch_related(
-        'perfiles'
-    ).all()
+    en_bd = {
+        p.Nombre_permiso.strip().lower(): p
+        for p in Permisos.objects.prefetch_related('perfiles')
+    }
 
-    if busqueda:
-        permisos = permisos.filter(
-            Q(Nombre_permiso__icontains=busqueda) |
-            Q(Descripcion_permiso__icontains=busqueda)
-        )
+    grupos = {}
+    total = 0
+
+    for nombre, descripcion, grupo in catalogo_plano():
+        if filtro and filtro not in nombre.lower() and filtro not in descripcion.lower():
+            continue
+
+        permiso = en_bd.get(nombre.lower())
+
+        grupos.setdefault(grupo, []).append({
+            'nombre': nombre,
+            'descripcion': descripcion,
+            'sincronizado': permiso is not None,
+            'perfiles': list(permiso.perfiles.all()) if permiso else [],
+        })
+        total += 1
 
     return render(
         request,
         'inventario/permisos.html',
         {
-            'permisos': permisos,
+            'grupos': grupos.items(),
+            'total': total,
             'busqueda': busqueda,
-            'usuario': usuario
+            'usuario': usuario,
+            'activo': 'permisos',
         }
     )
-
-
-def crear_permiso(request):
-
-    usuario = usuario_es_administrador(request)
-
-    if not usuario:
-        return redirect('panel_principal')
-
-    if request.method == 'POST':
-
-        nombre_permiso = request.POST.get(
-            'Nombre_permiso',
-            ''
-        ).strip()
-
-        descripcion_permiso = request.POST.get(
-            'Descripcion_permiso',
-            ''
-        ).strip()
-
-        if not nombre_permiso:
-            messages.error(
-                request,
-                'Debe ingresar el nombre del permiso.'
-            )
-
-            return redirect('gestion_permisos')
-
-        if Permisos.objects.filter(
-            Nombre_permiso__iexact=nombre_permiso
-        ).exists():
-            messages.error(
-                request,
-                'Ya existe un permiso con ese nombre.'
-            )
-
-            return redirect('gestion_permisos')
-
-        Permisos.objects.create(
-            Nombre_permiso=nombre_permiso,
-            Descripcion_permiso=descripcion_permiso
-        )
-
-        messages.success(
-            request,
-            'Permiso creado correctamente.'
-        )
-
-    return redirect('gestion_permisos')
-
-
-def editar_permiso(request, pk):
-
-    usuario = usuario_es_administrador(request)
-
-    if not usuario:
-        return redirect('panel_principal')
-
-    permiso = get_object_or_404(
-        Permisos,
-        ID_Permiso=pk
-    )
-
-    if request.method == 'POST':
-
-        nombre_permiso = request.POST.get(
-            'Nombre_permiso',
-            ''
-        ).strip()
-
-        descripcion_permiso = request.POST.get(
-            'Descripcion_permiso',
-            ''
-        ).strip()
-
-        if not nombre_permiso:
-            messages.error(
-                request,
-                'Debe ingresar el nombre del permiso.'
-            )
-
-            return redirect('gestion_permisos')
-
-        existe = Permisos.objects.filter(
-            Nombre_permiso__iexact=nombre_permiso
-        ).exclude(
-            ID_Permiso=pk
-        ).exists()
-
-        if existe:
-            messages.error(
-                request,
-                'Ya existe otro permiso con ese nombre.'
-            )
-
-            return redirect('gestion_permisos')
-
-        antes = snapshot(permiso)
-
-        permiso.Nombre_permiso = nombre_permiso
-        permiso.Descripcion_permiso = descripcion_permiso
-        permiso.save()
-
-        registrar_auditoria(usuario, 'Permisos', permiso, 'MODIFICACION', antes, snapshot(permiso))
-
-        messages.success(
-            request,
-            'Permiso modificado correctamente.'
-        )
-
-    return redirect('gestion_permisos')
-
-
-@require_POST
-def eliminar_permiso(request, pk):
-
-    usuario = usuario_es_administrador(request)
-
-    if not usuario:
-        return redirect('panel_principal')
-
-    permiso = get_object_or_404(
-        Permisos,
-        ID_Permiso=pk
-    )
-
-    nombre_permiso = permiso.Nombre_permiso
-
-    perfiles_asignados = list(
-        permiso.perfiles.values_list('Nombre_perfil', flat=True)
-    )
-
-    if perfiles_asignados:
-        messages.error(
-            request,
-            f'No se puede eliminar el permiso "{nombre_permiso}": '
-            f'está asignado a {", ".join(perfiles_asignados)}. '
-            'Quítelo primero desde Editar perfil.'
-        )
-        return redirect('gestion_permisos')
-
-    permiso.delete()
-
-    messages.success(
-        request,
-        f'El permiso "{nombre_permiso}" fue eliminado correctamente.'
-    )
-
-    return redirect('gestion_permisos')
 
 
 
@@ -2019,10 +1893,6 @@ def mis_permisos(request):
 
     if not usuario:
         return redirect('login')
-
-    # Solo permite acceder al perfil de Vendedor.
-    if usuario.ID_Perfil.Nombre_perfil != 'Vendedor':
-        return redirect('panel_principal')
 
     # Obtiene los permisos asignados al perfil del usuario.
     permisos = usuario.ID_Perfil.permisos.all()
@@ -2062,6 +1932,10 @@ def _leer_datos_producto(request, estado_por_defecto):
     precio_input = request.POST.get('Precio', '').strip()
     cantidad_input = request.POST.get(
         'Cantidad_presentacion', ''
+    ).strip()
+
+    unidades_input = request.POST.get(
+        'Unidades_por_presentacion', ''
     ).strip()
 
     unidad_medida = request.POST.get(
@@ -2165,6 +2039,18 @@ def _leer_datos_producto(request, estado_por_defecto):
         cantidad_presentacion = None
 
     # --------------------------------------------------------
+    # VALIDAR UNIDADES POR PRESENTACIÓN
+    # --------------------------------------------------------
+
+    try:
+        unidades_por_presentacion = int(unidades_input or 1)
+    except (ValueError, TypeError):
+        return None, 'Las unidades por presentación no son válidas.'
+
+    if unidades_por_presentacion < 1:
+        return None, 'Las unidades por presentación deben ser al menos 1.'
+
+    # --------------------------------------------------------
     # VALIDAR STOCK MÍNIMO
     # --------------------------------------------------------
 
@@ -2182,6 +2068,29 @@ def _leer_datos_producto(request, estado_por_defecto):
             return None, 'El stock mínimo no puede ser negativo.'
     else:
         stock_minimo = None
+
+    # --------------------------------------------------------
+    # VALIDAR PROVEEDORES QUE SUMINISTRAN EL PRODUCTO
+    # --------------------------------------------------------
+
+    ids_proveedores = {
+        i.strip()
+        for i in request.POST.getlist('proveedores')
+        if i.strip().isdigit()
+    }
+
+    proveedores_producto = list(
+        Proveedores.objects.filter(
+            ID_Proveedor__in=ids_proveedores,
+            estado_proveedor=True
+        )
+    )
+
+    if not proveedores_producto:
+        return None, 'Seleccioná al menos un proveedor que suministre el producto.'
+
+    if len(proveedores_producto) != len(ids_proveedores):
+        return None, 'Alguno de los proveedores seleccionados no existe o está inactivo.'
 
     # --------------------------------------------------------
     # VALIDAR ESTADO
@@ -2203,6 +2112,8 @@ def _leer_datos_producto(request, estado_por_defecto):
         'descripcion': descripcion or None,
         'precio': precio,
         'cantidad_presentacion': cantidad_presentacion,
+        'unidades_por_presentacion': unidades_por_presentacion,
+        'proveedores': proveedores_producto,
         'unidad_medida': unidad_medida or None,
         'estado_producto': estado_producto,
     }
@@ -2210,11 +2121,15 @@ def _leer_datos_producto(request, estado_por_defecto):
     return datos, None
 
 
-def _producto_duplicado(nombre, marca, excluir_pk=None):
-    """Comprueba si existe otro producto con el mismo nombre y marca."""
+def _producto_duplicado(nombre, marca, cantidad_presentacion,
+                        unidades, excluir_pk=None):
+    """Comprueba si existe otro producto con el mismo nombre, marca
+    y presentación (cantidad y unidades por presentación)."""
 
     productos = Productos.objects.filter(
-        Nombre_producto__iexact=nombre
+        Nombre_producto__iexact=nombre,
+        Cantidad_presentacion=cantidad_presentacion,
+        Unidades_por_presentacion=unidades,
     )
 
     if marca:
@@ -2241,7 +2156,11 @@ def gestion_productos(request):
     usuario = usuario_con_acceso(request, 'productos')
 
     if not usuario:
-        return redirect('login')
+        messages.error(
+            request,
+            'No tenés permiso para consultar productos.'
+        )
+        return redirect('panel_principal')
 
     busqueda = request.GET.get('q', '').strip()
     tipo_id = request.GET.get('tipo', '').strip()
@@ -2252,6 +2171,7 @@ def gestion_productos(request):
         'ID_Subtipo',
         'stock'
     ).prefetch_related(
+        'proveedores',
         Prefetch(
             'lotes',
             queryset=Lotes.objects.select_related(
@@ -2302,6 +2222,8 @@ def gestion_productos(request):
 
 
     # MOSTRAR PRODUCTOS
+    puede_egresar = puede(usuario, 'egresos', gestionar=True)
+
     return render(
         request,
         'inventario/productos.html',
@@ -2315,9 +2237,13 @@ def gestion_productos(request):
                 Estado_producto='Activo'
             ).count(),
             'total_tipos': tipos_productos.count(),
+            'proveedores_activos': Proveedores.objects.filter(
+                estado_proveedor=True
+            ).order_by('nombre_proveedor'),
+            'puede_egresar': puede_egresar,
+            'datos_egreso': _datos_egreso() if puede_egresar else [],
         }
     )
-
 
 def crear_producto(request):
     """Registra un producto con su tipo y subtipo correspondiente."""
@@ -2349,7 +2275,9 @@ def crear_producto(request):
 
     if _producto_duplicado(
         datos['nombre'],
-        datos['marca']
+        datos['marca'],
+        datos['cantidad_presentacion'],
+        datos['unidades_por_presentacion']
     ):
         messages.error(
             request,
@@ -2367,9 +2295,12 @@ def crear_producto(request):
             Descripcion_producto=datos['descripcion'],
             Precio=datos['precio'],
             Cantidad_presentacion=datos['cantidad_presentacion'],
+            Unidades_por_presentacion=datos['unidades_por_presentacion'],
             Unidad_medida_producto=datos['unidad_medida'],
             Estado_producto=datos['estado_producto'],
         )
+
+        producto.proveedores.set(datos['proveedores'])
 
         # El stock inicial es cero.
         # Las entradas se registran mediante lotes.
@@ -2449,6 +2380,8 @@ def editar_producto(request, pk):
     if _producto_duplicado(
         datos['nombre'],
         datos['marca'],
+        datos['cantidad_presentacion'],
+        datos['unidades_por_presentacion'],
         excluir_pk=pk
     ):
         messages.error(
@@ -2466,11 +2399,13 @@ def editar_producto(request, pk):
         producto.Descripcion_producto = datos['descripcion']
         producto.Precio = datos['precio']
         producto.Cantidad_presentacion = datos['cantidad_presentacion']
+        producto.Unidades_por_presentacion = datos['unidades_por_presentacion']
         producto.Unidad_medida_producto = datos['unidad_medida']
         producto.Estado_producto = datos['estado_producto']
         
 
         producto.save()
+        producto.proveedores.set(datos['proveedores'])
 
         # Actualizar el stock mínimo sin modificar el stock actual.
         if datos['stock_minimo'] is not None:
@@ -2518,7 +2453,7 @@ def editar_producto(request, pk):
 def eliminar_producto(request, pk):
     """Elimina un producto únicamente si no tiene lotes asociados."""
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'productos', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -2663,7 +2598,24 @@ def gestion_movimientos_stock(request):
     busqueda = request.GET.get('q', '').strip()
     tipo_sel = request.GET.get('tipo', '').strip()
 
-    # Mostrar únicamente los movimientos permitidos.
+    # Asegura que los tipos existan en la base de datos.
+    for nombre_tipo in (
+        'Entrada de lote',
+        'Salida por vencimiento de producto',
+        TIPO_EGRESO,
+        TIPO_ANULACION_REMITO,
+    ):
+        TiposMovimientos.objects.get_or_create(
+            Nombre_tipo_movimiento=nombre_tipo
+        )
+
+    tipos_visibles = [
+        'Entrada de lote',
+        'Salida por vencimiento de producto',
+        TIPO_EGRESO,
+        TIPO_ANULACION_REMITO,
+    ]
+
     movimientos = MovimientosStock.objects.select_related(
         'ID_Usuario',
         'ID_Tipo_movimiento',
@@ -2672,12 +2624,7 @@ def gestion_movimientos_stock(request):
         'ID_Lote__ID_Remito',
         'ID_Lote__ID_Remito__ID_Proveedor'
     ).filter(
-        Q(
-            ID_Tipo_movimiento__Nombre_tipo_movimiento__iexact='Entrada de lote'
-        )
-        | Q(
-            ID_Tipo_movimiento__Nombre_tipo_movimiento__iexact='Salida por vencimiento de producto'
-        )
+        ID_Tipo_movimiento__Nombre_tipo_movimiento__in=tipos_visibles
     ).order_by('-Fecha_hora_movimiento')
 
     if busqueda:
@@ -2692,13 +2639,8 @@ def gestion_movimientos_stock(request):
             ID_Tipo_movimiento_id=tipo_sel
         )
 
-    # Mostrar solamente estos tipos en el filtro.
     todos_tipos = TiposMovimientos.objects.filter(
-        Q(Nombre_tipo_movimiento__iexact='Entrada de lote')
-        |   Q(
-            Nombre_tipo_movimiento__iexact=
-            'Salida por vencimiento de producto'
-        )
+        Nombre_tipo_movimiento__in=tipos_visibles
     ).order_by('Nombre_tipo_movimiento')
 
     return render(
@@ -2965,7 +2907,7 @@ def gestion_alertas(request):
 
 @require_POST
 def atender_alerta(request, id_alerta):
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_accion(request, 'atender_alertas')
 
     if not usuario:
         return redirect('panel_principal')
@@ -3416,13 +3358,13 @@ def gestion_remitos(request):
     usuario = usuario_con_acceso(
         request,
         'remitos',
-        gestionar=True
+        gestionar=(request.method == 'POST')
     )
 
     if not usuario:
         messages.error(
             request,
-            'No tenés permiso para gestionar remitos.'
+            'No tenés permiso para esta operación sobre remitos.'
         )
         return redirect('panel_principal')
 
@@ -3442,7 +3384,8 @@ def gestion_remitos(request):
             productos_ids = request.POST.getlist('lote_producto')
             numeros_lote = request.POST.getlist('lote_numero')
             vencimientos = request.POST.getlist('lote_vencimiento')
-            cantidades = request.POST.getlist('lote_cantidad')
+            cajas_lista = request.POST.getlist('lote_cajas')
+            unidades_lista = request.POST.getlist('lote_unidades_caja')
 
             if not proveedor_id or not numero_remito or not fecha_texto:
                 messages.error(request, 'Completá los datos del remito.')
@@ -3450,7 +3393,8 @@ def gestion_remitos(request):
 
             if not (
                 len(productos_ids) == len(numeros_lote)
-                == len(vencimientos) == len(cantidades)
+                == len(vencimientos) == len(cajas_lista)
+                == len(unidades_lista)
             ) or not productos_ids:
                 messages.error(
                     request,
@@ -3496,8 +3440,12 @@ def gestion_remitos(request):
             lotes_validados = []
             combinaciones = set()
 
-            for producto_id, numero_lote, vencimiento_texto, cantidad_texto in zip(
-                productos_ids, numeros_lote, vencimientos, cantidades
+            for (
+                producto_id, numero_lote, vencimiento_texto,
+                cajas_texto, unidades_texto
+            ) in zip(
+                productos_ids, numeros_lote, vencimientos,
+                cajas_lista, unidades_lista
             ):
                 numero_lote = numero_lote.strip()
 
@@ -3505,7 +3453,8 @@ def gestion_remitos(request):
                     producto_id,
                     numero_lote,
                     vencimiento_texto,
-                    cantidad_texto
+                    cajas_texto,
+                    unidades_texto
                 ]):
                     messages.error(
                         request,
@@ -3521,7 +3470,8 @@ def gestion_remitos(request):
                     return redirect('gestion_remitos')
 
                 try:
-                    cantidad = int(cantidad_texto)
+                    cajas = int(cajas_texto)
+                    unidades_caja = int(unidades_texto)
                     fecha_vencimiento = date.fromisoformat(
                         vencimiento_texto
                     )
@@ -3532,10 +3482,17 @@ def gestion_remitos(request):
                     )
                     return redirect('gestion_remitos')
 
-                if cantidad <= 0:
+                if unidades_caja <= 0:
                     messages.error(
                         request,
-                        'La cantidad de cada lote debe ser mayor a cero.'
+                        'Las unidades por caja de cada lote deben ser mayor a cero.'
+                    )
+                    return redirect('gestion_remitos')
+
+                if cajas <= 0:
+                    messages.error(
+                        request,
+                        'La cantidad de cajas de cada lote debe ser mayor a cero.'
                     )
                     return redirect('gestion_remitos')
 
@@ -3568,6 +3525,21 @@ def gestion_remitos(request):
                     return redirect('gestion_remitos')
                 
                 
+                # El producto debe ser suministrado por el proveedor del remito.
+                if not producto.proveedores.filter(
+                    pk=proveedor.pk
+                ).exists():
+                    messages.error(
+                        request,
+                        f'El producto "{producto.Nombre_producto}" no es '
+                        f'suministrado por el proveedor '
+                        f'"{proveedor.nombre_proveedor}".'
+                    )
+                    return redirect('gestion_remitos')
+
+                # Unidades totales = cajas x unidades por caja.
+                cantidad = cajas * unidades_caja
+
             # Verificar si el lote ya existe en la base de datos.
                 if Lotes.objects.filter(
                     ID_Producto=producto,
@@ -3596,6 +3568,8 @@ def gestion_remitos(request):
                     'producto': producto,
                     'numero': numero_lote,
                     'vencimiento': fecha_vencimiento,
+                    'cajas': cajas,
+                    'unidades_caja': unidades_caja,
                     'cantidad': cantidad,
                 })
 
@@ -3624,6 +3598,8 @@ def gestion_remitos(request):
                             ID_Remito=remito,
                             ID_Producto=datos['producto'],
                             Numero_lote=datos['numero'],
+                            Cantidad_cajas=datos['cajas'],
+                            Unidades_por_caja=datos['unidades_caja'],
                             Cantidad_ingresada=datos['cantidad'],
                             Cantidad_actual=datos['cantidad'],
                             Fecha_ingreso=hoy,
@@ -3717,6 +3693,14 @@ def gestion_remitos(request):
 
             try:
                 remito = Remitos.objects.get(ID_Remito=remito_id)
+
+                if remito.Estado_remito == 'Anulado':
+                    messages.error(
+                        request,
+                        'No se puede modificar un remito anulado.'
+                    )
+                    return redirect('gestion_remitos')
+
                 antes = snapshot(remito)
                 remito.Numero_remito = numero_remito
                 remito.Fecha_remito = fecha_remito
@@ -3754,8 +3738,11 @@ def gestion_remitos(request):
             lote_id = request.POST.get('ID_Lote', '').strip()
             producto_id = request.POST.get('ID_Producto', '').strip()
             numero_lote = request.POST.get('Numero_lote', '').strip()
-            cantidad_ingresada_texto = request.POST.get(
-                'Cantidad_ingresada', ''
+            cajas_texto = request.POST.get(
+                'Cantidad_cajas', ''
+            ).strip()
+            unidades_caja_texto = request.POST.get(
+                'Unidades_por_caja', ''
             ).strip()
             cantidad_actual_texto = request.POST.get(
                 'Cantidad_actual', ''
@@ -3769,7 +3756,7 @@ def gestion_remitos(request):
 
             if not all([
                 lote_id, producto_id, numero_lote,
-                cantidad_ingresada_texto, cantidad_actual_texto,
+                cajas_texto, unidades_caja_texto, cantidad_actual_texto,
                 fecha_ingreso_texto, vencimiento_texto
             ]):
                 messages.error(request, 'Completá todos los campos del lote.')
@@ -3783,7 +3770,8 @@ def gestion_remitos(request):
                 return redirect('gestion_remitos')
 
             try:
-                cantidad_ingresada = int(cantidad_ingresada_texto)
+                cajas = int(cajas_texto)
+                unidades_caja = int(unidades_caja_texto)
                 cantidad_actual = int(cantidad_actual_texto)
                 fecha_ingreso = date.fromisoformat(fecha_ingreso_texto)
                 fecha_vencimiento = date.fromisoformat(vencimiento_texto)
@@ -3794,12 +3782,22 @@ def gestion_remitos(request):
                 )
                 return redirect('gestion_remitos')
 
-            if cantidad_ingresada <= 0:
+            if cajas <= 0:
                 messages.error(
                     request,
-                    'La cantidad ingresada debe ser mayor a cero.'
+                    'La cantidad de cajas debe ser mayor a cero.'
                 )
                 return redirect('gestion_remitos')
+
+            if unidades_caja <= 0:
+                messages.error(
+                    request,
+                    'Las unidades por caja deben ser mayor a cero.'
+                )
+                return redirect('gestion_remitos')
+
+            # Unidades totales = cajas x unidades por caja.
+            cantidad_ingresada = cajas * unidades_caja
 
             if not 0 <= cantidad_actual <= cantidad_ingresada:
                 messages.error(
@@ -3827,6 +3825,13 @@ def gestion_remitos(request):
                     lote = Lotes.objects.select_for_update().select_related(
                         'ID_Producto', 'ID_Remito'
                     ).get(ID_Lote=lote_id)
+
+                    if lote.ID_Remito.Estado_remito == 'Anulado':
+                        messages.error(
+                            request,
+                            'No se puede modificar un lote de un remito anulado.'
+                        )
+                        return redirect('gestion_remitos')
 
                     producto = Productos.objects.filter(
                         ID_Producto=producto_id,
@@ -3961,6 +3966,8 @@ def gestion_remitos(request):
 
                     lote.ID_Producto = producto
                     lote.Numero_lote = numero_lote
+                    lote.Cantidad_cajas = cajas
+                    lote.Unidades_por_caja = unidades_caja
                     lote.Cantidad_ingresada = cantidad_ingresada
                     lote.Cantidad_actual = cantidad_actual
                     lote.Fecha_ingreso = fecha_ingreso
@@ -3999,6 +4006,151 @@ def gestion_remitos(request):
 
             return redirect('gestion_remitos')
 
+        # ====================================================
+        # ANULAR REMITO (no se elimina: cambia de estado)
+        # ====================================================
+        elif accion == 'anular_remito':
+            remito_id = request.POST.get('ID_Remito', '').strip()
+            motivo = request.POST.get('Motivo_anulacion', '').strip()
+
+            if not puede_accion(usuario, 'anular_remitos'):
+                messages.error(
+                    request,
+                    'No tenés permiso para anular remitos.'
+                )
+                return redirect('gestion_remitos')
+
+            if len(motivo) < 10:
+                messages.error(
+                    request,
+                    'Si anula este remito debe justificarlo '
+                    '(mínimo 10 caracteres).'
+                )
+                return redirect('gestion_remitos')
+
+            if len(motivo) > 200:
+                messages.error(
+                    request,
+                    'La justificación no puede superar los 200 caracteres.'
+                )
+                return redirect('gestion_remitos')
+
+            try:
+                with transaction.atomic():
+                    remito = Remitos.objects.select_for_update().get(
+                        ID_Remito=remito_id
+                    )
+
+                    if remito.Estado_remito == 'Anulado':
+                        messages.error(
+                            request,
+                            'El remito ya se encuentra anulado.'
+                        )
+                        return redirect('gestion_remitos')
+
+                    lotes_remito = list(
+                        Lotes.objects.select_for_update().select_related(
+                            'ID_Producto'
+                        ).filter(ID_Remito=remito)
+                    )
+
+                    # Validar todo antes de modificar nada.
+                    stocks = {}
+
+                    for lote_r in lotes_remito:
+                        if lote_r.Cantidad_actual != lote_r.Cantidad_ingresada:
+                            messages.error(
+                                request,
+                                f'No se puede anular: el lote '
+                                f'"{lote_r.Numero_lote}" ya tuvo salidas.'
+                            )
+                            return redirect('gestion_remitos')
+
+                        stock_r = stocks.get(lote_r.ID_Producto_id)
+
+                        if stock_r is None:
+                            stock_r = Stock.objects.select_for_update().filter(
+                                ID_Producto=lote_r.ID_Producto
+                            ).first()
+                            stocks[lote_r.ID_Producto_id] = stock_r
+
+                        if not stock_r:
+                            messages.error(
+                                request,
+                                f'No se encontró el stock de '
+                                f'"{lote_r.ID_Producto.Nombre_producto}".'
+                            )
+                            return redirect('gestion_remitos')
+
+                    tipo_anulacion, _ = TiposMovimientos.objects.get_or_create(
+                        Nombre_tipo_movimiento=TIPO_ANULACION_REMITO
+                    )
+
+                    antes = snapshot(remito)
+                    antes['Estado_remito'] = remito.Estado_remito
+
+                    # Revertir el ingreso: stock, lote y movimiento.
+                    for lote_r in lotes_remito:
+                        stock_r = stocks[lote_r.ID_Producto_id]
+                        stock_r.Cantidad_stock -= lote_r.Cantidad_ingresada
+                        stock_r.save(update_fields=['Cantidad_stock'])
+
+                        MovimientosStock.objects.create(
+                            ID_Usuario=usuario,
+                            ID_Tipo_movimiento=tipo_anulacion,
+                            ID_Lote=lote_r,
+                            Cantidad_movimiento_stock=lote_r.Cantidad_ingresada,
+                            Observaciones=(
+                                f'Anulación del remito '
+                                f'{remito.Numero_remito}: {motivo}'
+                            )[:255]
+                        )
+
+                        lote_r.Cantidad_actual = 0
+                        lote_r.save(update_fields=['Cantidad_actual'])
+
+                    remito.Estado_remito = 'Anulado'
+                    remito.Fecha_anulacion = timezone.now()
+                    remito.Motivo_anulacion = motivo
+                    remito.ID_Usuario_anulacion = usuario
+                    remito.save(update_fields=[
+                        'Estado_remito',
+                        'Fecha_anulacion',
+                        'Motivo_anulacion',
+                        'ID_Usuario_anulacion',
+                    ])
+
+                    despues = snapshot(remito)
+                    despues['Estado_remito'] = 'Anulado'
+                    despues['Motivo_anulacion'] = motivo
+
+                    registrar_auditoria(
+                        usuario,
+                        'Remitos',
+                        remito,
+                        'ANULACION',
+                        antes,
+                        despues
+                    )
+
+                messages.success(
+                    request,
+                    f'El remito {remito.Numero_remito} fue anulado y se '
+                    f'revirtió su ingreso de stock.'
+                )
+
+            except Remitos.DoesNotExist:
+                messages.error(request, 'El remito seleccionado no existe.')
+
+            except DatabaseError:
+                messages.error(
+                    request,
+                    'Ocurrió un error en la base de datos. '
+                    'No se guardaron los cambios.'
+                )
+
+            return redirect('gestion_remitos')
+
         # Si la acción recibida no es válida.
         messages.error(request, 'La operación solicitada no es válida.')
         return redirect('gestion_remitos')
@@ -4010,13 +4162,22 @@ def gestion_remitos(request):
     # ========================================================
     remitos = (
         Remitos.objects
-        .select_related('ID_Proveedor')
+        .select_related('ID_Proveedor', 'ID_Usuario_anulacion')
         .prefetch_related('lotes__ID_Producto')
+        .annotate(
+            total_unidades=Coalesce(Sum('lotes__Cantidad_ingresada'), 0)
+        )
         .order_by('-Fecha_remito', '-ID_Remito')
     )
 
     busqueda = request.GET.get('q', '').strip()
     proveedor_filtro = request.GET.get('proveedor', '').strip()
+    estado_filtro = request.GET.get('estado', '').strip()
+
+    if estado_filtro in ('Confirmado', 'Anulado'):
+        remitos = remitos.filter(Estado_remito=estado_filtro)
+    else:
+        estado_filtro = ''
 
     if busqueda:
         remitos = remitos.filter(
@@ -4035,6 +4196,8 @@ def gestion_remitos(request):
 
     productos_alta = Productos.objects.filter(
         Estado_producto='Activo'
+    ).prefetch_related(
+        'proveedores'
     ).order_by('Nombre_producto')
 
     return render(
@@ -4053,6 +4216,9 @@ def gestion_remitos(request):
             'total_lotes': Lotes.objects.count(),
             'busqueda': busqueda,
             'proveedor_filtro': proveedor_filtro,
+            'estado_filtro': estado_filtro,
+            'puede_anular': puede_accion(usuario, 'anular_remitos'),
+            'puede_gestionar': puede(usuario, 'remitos', gestionar=True),
             'hoy': hoy,
         }
     )
@@ -4062,7 +4228,7 @@ def gestion_remitos(request):
 @require_POST
 def eliminar_proveedor(request, pk):
 
-    if not usuario_es_administrador(request):
+    if not usuario_con_acceso(request, 'proveedores', gestionar=True):
         return redirect('panel_principal')
 
     proveedor = get_object_or_404(Proveedores, ID_Proveedor=pk)
@@ -4087,7 +4253,7 @@ def eliminar_proveedor(request, pk):
 @require_POST
 def eliminar_usuario(request, pk):
 
-    admin = usuario_es_administrador(request)
+    admin = usuario_con_acceso(request, 'usuarios', gestionar=True)
 
     if not admin:
         return redirect('panel_principal')
@@ -4119,7 +4285,7 @@ def eliminar_usuario(request, pk):
 @require_POST
 def eliminar_perfil(request, pk):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'perfiles', gestionar=True)
 
     if not usuario:
         return redirect('panel_principal')
@@ -4173,12 +4339,12 @@ def _inicio_dia(d):
 
 def gestion_auditoria(request):
 
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'auditoria')
 
     if not usuario:
         messages.error(
             request,
-            'Solo el administrador puede consultar la auditoría.'
+            'No tenés permiso para consultar la auditoría.'
         )
         return redirect('panel_principal')
 
@@ -4189,11 +4355,13 @@ def gestion_auditoria(request):
     fecha_hasta = request.GET.get('fecha_hasta', '').strip()
 
     logs = LogAuditoria.objects.select_related(
-        'ID_Usuario'
+        'ID_Usuario__ID_Perfil'
+    ).exclude(
+        Accion='EGRESO_STOCK'
     ).order_by('-Fecha_hora')
     
     if entidad:
-        logs = logs.filter(Entidad=entidad)
+        logs = logs.filter(Seccion=entidad)
 
     if accion:
         logs = logs.filter(Accion=accion)
@@ -4220,8 +4388,10 @@ def gestion_auditoria(request):
         {
             'usuario': usuario,
             'pagina': pagina,
-            'entidades': LogAuditoria.objects.values_list(
-                'Entidad', flat=True
+            'entidades': LogAuditoria.objects.exclude(
+                Accion='EGRESO_STOCK'
+            ).order_by('Seccion').values_list(
+                'Seccion', flat=True
             ).distinct(),
             'usuarios': Usuarios.objects.order_by(
                 'Apellido_usuario', 'Nombre_usuario'
@@ -4235,8 +4405,37 @@ def gestion_auditoria(request):
         }
     )
 
+# Campos que guardan el ID de otro registro: en pantalla se muestra su nombre.
+_REFERENCIAS_AUDITORIA = {
+    'ID_Tipo_producto': (TiposProductos, lambda o: o.Nombre_tipo_producto),
+    'ID_Subtipo': (Subtipos, lambda o: o.Nombre_subtipo),
+    'ID_Proveedor': (Proveedores, lambda o: o.nombre_proveedor),
+    'ID_Producto': (Productos, lambda o: o.Nombre_producto),
+    'ID_Remito': (Remitos, lambda o: o.Numero_remito),
+    'ID_Perfil': (Perfiles, lambda o: o.Nombre_perfil),
+    'ID_Usuario_anulacion': (
+        Usuarios,
+        lambda o: f'{o.Apellido_usuario}, {o.Nombre_usuario}'
+    ),
+}
+
+
+def _valor_visible_auditoria(campo, valor):
+    """Reemplaza el ID de un registro relacionado por su nombre."""
+
+    referencia = _REFERENCIAS_AUDITORIA.get(campo)
+
+    if referencia is None or valor in (None, ''):
+        return valor
+
+    modelo, nombre = referencia
+    objeto = modelo.objects.filter(pk=valor).first()
+
+    return nombre(objeto) if objeto else 'Registro eliminado'
+
+
 def detalle_auditoria(request, id_log):
-    usuario = usuario_es_administrador(request)
+    usuario = usuario_con_acceso(request, 'auditoria')
 
     if not usuario:
         return JsonResponse(
@@ -4246,27 +4445,417 @@ def detalle_auditoria(request, id_log):
 
     log = get_object_or_404(LogAuditoria, pk=id_log)
 
+    # La fecha se guarda en UTC: se muestra en la hora local del sistema.
+    fecha_local = timezone.localtime(log.Fecha_hora)
+
+    anteriores = log.Valores_anteriores or {}
+    actuales = log.Valores_actuales or {}
+
+    # Qué se muestra en el detalle según la acción:
+    #   datos   -> altas y eliminaciones: los datos del registro
+    #   cambios -> modificaciones y anulaciones: valor anterior y nuevo
+    #   ninguno -> inicio y cierre de sesión: nada más que los datos básicos
+    if log.Accion == 'CREACION':
+        modo, origen = 'datos', actuales
+    elif log.Accion == 'ELIMINACION':
+        modo, origen = 'datos', anteriores
+    elif log.Accion in ('INICIO_SESION', 'CIERRE_SESION'):
+        modo, origen = 'ninguno', {}
+    else:
+        modo, origen = 'cambios', {}
+
     return JsonResponse({
         'id': log.ID_Log,
-        'fecha': log.Fecha_hora.strftime('%d/%m/%Y'),
-        'hora': log.Fecha_hora.strftime('%H:%M'),
+        'fecha': fecha_local.strftime('%d/%m/%Y'),
+        'hora': fecha_local.strftime('%H:%M'),
         'usuario': (
             f'{log.ID_Usuario.Apellido_usuario}, '
             f'{log.ID_Usuario.Nombre_usuario}'
             if log.ID_Usuario else 'Sistema'
         ),
-        'perfil': log.Perfil_usuario or 'Sin perfil',
-        'entidad': log.Entidad,
+        'perfil': (
+            log.ID_Usuario.ID_Perfil.Nombre_perfil
+            if log.ID_Usuario and log.ID_Usuario.ID_Perfil
+            else 'Sin perfil'
+        ),
+        'entidad': log.Seccion,
         'registro': log.ID_Registro,
         'accion': log.Accion,
-        'anteriores': log.Valores_anteriores or {},
-        'actuales': log.Valores_actuales or {},
+        'modo': modo,
+        'datos': [
+            {
+                'campo': campo,
+                'valor': _valor_visible_auditoria(campo, valor)
+            }
+            for campo, valor in sorted(origen.items())
+        ],
+        'anteriores': anteriores,
+        'actuales': actuales,
         'cambios': [
             {
                 'campo': campo,
-                'antes': antes,
-                'despues': despues
+                'antes': _valor_visible_auditoria(campo, antes),
+                'despues': _valor_visible_auditoria(campo, despues)
             }
             for campo, antes, despues in log.cambios
-        ]
+        ] if modo == 'cambios' else []
     })
+
+# ============================================================
+# EGRESO DE STOCK
+# ============================================================
+
+TIPO_EGRESO = 'Egreso por venta'
+TIPO_ANULACION_REMITO = 'Anulación de remito'
+
+
+def _alerta_stock_bajo(stock, producto):
+    """Genera una alerta si el stock quedó en o bajo el mínimo."""
+
+    if stock.Cantidad_stock > stock.Stock_minimo:
+        return False
+
+    if Alertas.objects.filter(
+        ID_Stock=stock,
+        Tipo_alerta='Stock bajo',
+        Atendida=False
+    ).exists():
+        return True
+
+    Alertas.objects.create(
+        ID_Stock=stock,
+        Tipo_alerta='Stock bajo',
+        Mensaje=(
+            f'El producto {producto.Nombre_producto} quedó con '
+            f'{stock.Cantidad_stock} unidades '
+            f'(stock mínimo: {stock.Stock_minimo}).'
+        ),
+        Cantidad_al_generar=stock.Cantidad_stock,
+        Stock_minimo_al_generar=stock.Stock_minimo,
+        Atendida=False
+    )
+
+    return True
+
+
+def egreso_productos(request):
+    """Compatibilidad: abre la vista de productos con el modal de egreso."""
+    return redirect(f"{reverse('gestion_productos')}?egreso=1")
+
+
+def _datos_egreso():
+    """Productos activos con sus lotes vigentes (FEFO) para el modal."""
+
+    hoy = timezone.localdate()
+
+    productos = Productos.objects.filter(
+        Estado_producto='Activo'
+    ).select_related('stock').prefetch_related(
+        Prefetch(
+            'lotes',
+            queryset=Lotes.objects.select_related(
+                'ID_Remito',
+                'ID_Remito__ID_Proveedor'
+            ).filter(
+                Cantidad_actual__gt=0,
+                Fecha_vencimiento__gte=hoy
+            ).order_by('Fecha_vencimiento', 'ID_Lote'),
+            to_attr='lotes_disponibles'
+        )
+    ).order_by('Nombre_producto')
+
+    datos = []
+
+    for p in productos:
+        if not p.lotes_disponibles:
+            continue
+
+        stock = getattr(p, 'stock', None)
+
+        datos.append({
+            'id': p.ID_Producto,
+            'nombre': p.Nombre_producto,
+            'marca': p.Marca or '',
+            'stock': stock.Cantidad_stock if stock else 0,
+            'stock_minimo': stock.Stock_minimo if stock else 0,
+            'lotes': [
+                {
+                    'id': l.ID_Lote,
+                    'numero': l.Numero_lote,
+                    'remito': l.ID_Remito.Numero_remito,
+                    'proveedor': l.ID_Remito.ID_Proveedor.nombre_proveedor,
+                    'vence': l.Fecha_vencimiento.strftime('%d/%m/%Y'),
+                    'cantidad': l.Cantidad_actual,
+                }
+                for l in p.lotes_disponibles
+            ],
+        })
+
+    return datos
+
+
+@require_POST
+def registrar_egreso(request):
+    """Registra un egreso por venta descontando de un lote específico."""
+
+    usuario = usuario_con_acceso(request, 'egresos', gestionar=True)
+
+    if not usuario:
+        messages.error(
+            request,
+            'No tenés permiso para registrar egresos de stock.'
+        )
+        return redirect('panel_principal')
+
+    lote_id = request.POST.get('lote', '').strip()
+
+    if not lote_id.isdigit():
+        messages.error(request, 'Seleccioná un lote válido.')
+        return redirect('gestion_productos')
+
+    try:
+        cantidad = int(request.POST.get('cantidad', '').strip())
+    except (ValueError, TypeError):
+        messages.error(request, 'La cantidad ingresada no es válida.')
+        return redirect('gestion_productos')
+
+    if cantidad <= 0:
+        messages.error(request, 'La cantidad debe ser mayor a cero.')
+        return redirect('gestion_productos')
+
+    descripcion = request.POST.get('descripcion', '').strip()[:200]
+
+    lote_base = Lotes.objects.filter(ID_Lote=lote_id).first()
+
+    if not lote_base:
+        messages.error(request, 'El lote seleccionado no existe.')
+        return redirect('gestion_productos')
+
+    tipo_egreso, _ = TiposMovimientos.objects.get_or_create(
+        Nombre_tipo_movimiento=TIPO_EGRESO
+    )
+
+    hoy = timezone.localdate()
+    stock_bajo = False
+
+    try:
+        with transaction.atomic():
+
+            # Se bloquean stock y lote para evitar egresos simultáneos.
+            stock = Stock.objects.select_for_update().filter(
+                ID_Producto_id=lote_base.ID_Producto_id
+            ).first()
+
+            lote = Lotes.objects.select_for_update().get(
+                ID_Lote=lote_id
+            )
+
+            producto = lote.ID_Producto
+
+            if producto.Estado_producto != 'Activo':
+                messages.error(request, 'El producto está inactivo.')
+                return redirect('gestion_productos')
+
+            if not stock:
+                messages.error(
+                    request,
+                    'El producto no tiene stock registrado.'
+                )
+                return redirect('gestion_productos')
+
+            if lote.Fecha_vencimiento < hoy:
+                messages.error(
+                    request,
+                    'No se puede egresar de un lote vencido.'
+                )
+                return redirect('gestion_productos')
+
+            if cantidad > lote.Cantidad_actual:
+                messages.error(
+                    request,
+                    f'El lote {lote.Numero_lote} solo tiene '
+                    f'{lote.Cantidad_actual} unidades disponibles.'
+                )
+                return redirect('gestion_productos')
+
+            if cantidad > stock.Cantidad_stock:
+                messages.error(
+                    request,
+                    'La cantidad supera el stock del producto.'
+                )
+                return redirect('gestion_productos')
+
+            lote.Cantidad_actual -= cantidad
+            lote.save(update_fields=['Cantidad_actual'])
+
+            stock.Cantidad_stock -= cantidad
+            stock.save(update_fields=['Cantidad_stock'])
+
+            detalle = TIPO_EGRESO
+            if descripcion:
+                detalle = f'{TIPO_EGRESO}. {descripcion}'
+
+            MovimientosStock.objects.create(
+                ID_Usuario=usuario,
+                ID_Tipo_movimiento=tipo_egreso,
+                ID_Lote=lote,
+                Cantidad_movimiento_stock=cantidad,
+                Observaciones=detalle[:255]
+            )
+
+            stock_bajo = _alerta_stock_bajo(stock, producto)
+
+    except DatabaseError:
+        messages.error(
+            request,
+            'Ocurrió un error en la base de datos. '
+            'No se registró el egreso.'
+        )
+        return redirect('gestion_productos')
+
+    messages.success(
+        request,
+        f'Egreso registrado: {cantidad} unidad(es) de '
+        f'"{producto.Nombre_producto}" (lote {lote.Numero_lote}). '
+        f'Stock actual: {stock.Cantidad_stock}.'
+    )
+
+    if stock_bajo:
+        messages.warning(
+            request,
+            f'Atención: "{producto.Nombre_producto}" está en o por '
+            f'debajo del stock mínimo ({stock.Stock_minimo}).'
+        )
+
+    return redirect('gestion_productos')
+
+# ============================================================
+# REPORTES (solo Administrador)
+# ============================================================
+
+def gestion_reportes(request):
+
+    usuario = usuario_con_acceso(request, 'reportes')
+
+    if not usuario:
+        messages.error(
+            request,
+            'No tenés permiso para consultar los reportes.'
+        )
+        return redirect('panel_principal')
+
+    return render(
+        request,
+        'inventario/reportes.html',
+        {
+            'usuario': usuario,
+            'activo': 'reportes',
+            'graficos': generar_reportes(TIPO_EGRESO),
+        }
+    )
+
+def datos_evolucion(request):
+    """Ventas e ingresos entre dos fechas (JSON, solo Administrador)."""
+
+    if not usuario_con_acceso(request, 'reportes'):
+        return JsonResponse(
+            {'error': 'No tenés permiso para consultar los reportes.'},
+            status=403
+        )
+
+    desde = _fecha_iso(request.GET.get('desde', ''))
+    hasta = _fecha_iso(request.GET.get('hasta', ''))
+
+    if not desde or not hasta:
+        return JsonResponse(
+            {'error': 'Las fechas ingresadas no son válidas.'},
+            status=400
+        )
+
+    # No tiene sentido consultar fechas futuras.
+    hasta = min(hasta, timezone.localdate())
+
+    try:
+        datos = datos_evolucion_rango(desde, hasta, TIPO_EGRESO)
+    except ValueError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse(datos)
+
+# ============================================================
+# BLOQUEO POR INACTIVIDAD
+# ============================================================
+
+def bloqueo_sesion(request):
+
+    usuario = usuario_autenticado(request)
+
+    if not usuario:
+        return redirect('login')
+
+    siguiente = (
+        request.GET.get('next') or request.POST.get('next') or ''
+    )
+
+    if not siguiente or not url_has_allowed_host_and_scheme(
+        siguiente, allowed_hosts={request.get_host()}
+    ):
+        siguiente = reverse('panel_principal')
+
+    es_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    error = None
+
+    if request.method == 'POST':
+
+        usuario_ingresado = request.POST.get('usuario', '').strip()
+        password = request.POST.get('password', '')
+
+        if usuario_ingresado.lower() != usuario.Usuario.lower():
+            error = 'Ingresá con el mismo usuario de la sesión bloqueada.'
+
+        elif not check_password(password, usuario.Contrasena):
+            error = 'Usuario o contraseña incorrectos.'
+
+        else:
+            request.session['bloqueada'] = False
+            request.session['bloqueo_intentos'] = 0
+            request.session['ultima_actividad'] = time.time()
+            request.session.cycle_key()
+
+            if es_ajax:
+                return JsonResponse({'ok': True})
+
+            return redirect(siguiente)
+
+        intentos = request.session.get('bloqueo_intentos', 0) + 1
+        request.session['bloqueo_intentos'] = intentos
+
+        if intentos >= 5:
+            request.session.flush()
+
+            if es_ajax:
+                return JsonResponse(
+                    {'ok': False, 'cerrada': True,
+                     'error': 'Demasiados intentos. Se cerró la sesión.'},
+                    status=403
+                )
+
+            return redirect('login')
+
+        if es_ajax:
+            return JsonResponse({'ok': False, 'error': error}, status=400)
+
+    return render(
+        request,
+        'inventario/bloqueo.html',
+        {'usuario': usuario, 'error': error, 'siguiente': siguiente}
+    )
+
+
+def sesion_ping(request):
+    """Mantiene viva la sesión mientras el usuario está activo en pantalla."""
+
+    if not usuario_autenticado(request):
+        return JsonResponse({'ok': False}, status=401)
+
+    return JsonResponse({'ok': True})

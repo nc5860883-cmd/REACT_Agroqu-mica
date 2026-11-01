@@ -1,8 +1,7 @@
-from django.urls import path, include
+from django.urls import include, path
 from inventario import views
 
 urlpatterns = [
-
     # API para React
     path('api/', include('inventario.api_urls')),
 
@@ -36,7 +35,6 @@ urlpatterns = [
     path('subtipos/editar/<int:pk>/', views.editar_subtipo, name='editar_subtipo'),
     path('subtipos/eliminar/<int:pk>/', views.eliminar_subtipo, name='eliminar_subtipo'),
 
-
     # Usuarios
     path('usuarios/', views.gestion_usuarios, name='gestion_usuarios'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
@@ -47,7 +45,6 @@ urlpatterns = [
     path('usuarios/activar/<int:id>/', views.activar_usuario, name='activar_usuario'),
     path('usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'),
 
-
     # Perfiles
     path('perfiles/', views.gestion_perfiles, name='gestion_perfiles'),
     path('perfiles/crear/', views.crear_perfil, name='crear_perfil'),
@@ -56,23 +53,22 @@ urlpatterns = [
     path('mis-permisos/', views.mis_permisos, name='mis_permisos'),
     path('perfiles/eliminar/<int:pk>/', views.eliminar_perfil, name='eliminar_perfil'),
 
-
     # Productos
     path('productos/', views.gestion_productos, name='gestion_productos'),
     path('productos/crear/', views.crear_producto, name='crear_producto'),
     path('productos/editar/<int:pk>/', views.editar_producto, name='editar_producto'),
     path('productos/eliminar/<int:pk>/', views.eliminar_producto, name='eliminar_producto'),
 
-
+    # Egreso de stock
+    path('egreso-productos/', views.egreso_productos, name='egreso_productos'),
+    path('egreso-productos/registrar/', views.registrar_egreso, name='registrar_egreso'),
 
     # Lotes (solo consulta; el alta se hace desde Remitos)
     path('ingreso-lote/', views.registrar_ingreso_lote, name='registrar_ingreso_lote'),
 
-
     # Movimientos de stock
     path('movimientos-stock/', views.gestion_movimientos_stock, name='gestion_movimientos_stock'),
     path('movimientos-stock/<int:id_movimiento>/comprobante/', views.comprobante_movimiento_pdf, name='comprobante_movimiento_pdf'),
-
 
     # Alertas
     path('historial-alertas/', views.gestion_alertas, name='historial_alertas'),
@@ -80,15 +76,16 @@ urlpatterns = [
 
     # Permisos
     path('permisos/', views.gestion_permisos, name='gestion_permisos'),
-    path('permisos/crear/', views.crear_permiso, name='crear_permiso'),
-    path('permisos/editar/<int:pk>/', views.editar_permiso, name='editar_permiso'),
-    path('permisos/eliminar/<int:pk>/', views.eliminar_permiso, name='eliminar_permiso'),
-    
+
     # Auditoría (solo administrador)
     path('auditoria/', views.gestion_auditoria, name='gestion_auditoria'),
-    path(
-        'auditoria/detalle/<int:id_log>/',
-        views.detalle_auditoria,
-        name='detalle_auditoria'
-    ),
+    path('auditoria/detalle/<int:id_log>/', views.detalle_auditoria, name='detalle_auditoria'),
+
+    # Reportes (solo administrador)
+    path('reportes/', views.gestion_reportes, name='gestion_reportes'),
+    path('reportes/evolucion/', views.datos_evolucion, name='datos_evolucion'),
+
+    # Bloqueo por inactividad
+    path('bloqueo/', views.bloqueo_sesion, name='bloqueo'),
+    path('sesion/ping/', views.sesion_ping, name='sesion_ping'),
 ]
