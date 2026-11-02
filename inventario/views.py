@@ -1562,6 +1562,14 @@ def cambiar_contrasena(request):
 # GESTIÓN DE PERFILES
 # ============================================================
 
+def _permisos_de(perfil):
+    """Nombres de los permisos asignados a un perfil."""
+    return set(
+        PerfilesXPermisos.objects
+        .filter(ID_Perfil=perfil)
+        .values_list('ID_Permiso__Nombre_permiso', flat=True)
+    )
+
 def _snapshot_perfil(perfil):
     datos = snapshot(perfil)
     datos['permisos'] = ', '.join(sorted(

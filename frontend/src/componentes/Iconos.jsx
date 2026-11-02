@@ -82,6 +82,14 @@ export function IconosSprite() {
         <polyline points="16 17 21 12 16 7" />
         <line x1="21" y1="12" x2="9" y2="12" />
       </symbol>
+
+      <symbol id="i-chart" viewBox="0 0 24 24">
+        <line x1="4" y1="20" x2="20" y2="20" />
+        <rect x="6" y="11" width="3" height="9" />
+        <rect x="11" y="6" width="3" height="14" />
+        <rect x="16" y="14" width="3" height="6" />
+      </symbol>
+      
     </svg>
   );
 }

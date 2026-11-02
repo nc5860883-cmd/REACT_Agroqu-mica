@@ -2,68 +2,35 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useSesion } from '../contexto/SesionContext';
 import { Icono } from './Iconos';
 
-// Opciones del menú según el perfil, iguales a _sidebar.html.
-// { seccion } es un título; { ruta, icono, texto } es un enlace.
-
-const MENU_ADMINISTRACION = [
-  { seccion: 'ADMINISTRACIÓN' },
-  { ruta: '/usuarios', icono: 'users', texto: 'Usuarios del sistema' },
-
-  { seccion: 'INVENTARIO' },
-  { ruta: '/productos', icono: 'package', texto: 'Productos y stock' },
-  { ruta: '/tipos-productos', icono: 'layers', texto: 'Tipos de productos' },
-  { ruta: '/subtipos', icono: 'tags', texto: 'Subtipos' },
-  { ruta: '/proveedores', icono: 'truck', texto: 'Proveedores' },
-  { ruta: '/remitos', icono: 'inbox', texto: 'Remitos' },
-  { ruta: '/lotes', icono: 'package', texto: 'Lotes' },
-  { ruta: '/movimientos-stock', icono: 'swap', texto: 'Movimientos de stock' },
-  { ruta: '/historial-alertas', icono: 'bell', texto: 'Historial de alertas' },
-
-  { seccion: 'SEGURIDAD' },
-  { ruta: '/perfiles', icono: 'shield', texto: 'Perfiles de acceso' },
-  { ruta: '/permisos', icono: 'key', texto: 'Permisos del sistema' },
+// Igual que MENU en permissions.py: cada opción aparece si el perfil puede consultar ese módulo.
+const MENU = [
+  { titulo: 'ADMINISTRACIÓN', items: [
+    { modulo: 'usuarios', ruta: '/usuarios', icono: 'users', texto: 'Usuarios del sistema' },
+  ] },
+  { titulo: 'INVENTARIO', items: [
+    { modulo: 'productos', ruta: '/productos', icono: 'package', texto: 'Productos y stock' },
+    { modulo: 'tipos', ruta: '/tipos-productos', icono: 'layers', texto: 'Tipos de productos' },
+    { modulo: 'subtipos', ruta: '/subtipos', icono: 'tags', texto: 'Subtipos' },
+    { modulo: 'proveedores', ruta: '/proveedores', icono: 'truck', texto: 'Proveedores' },
+    { modulo: 'remitos', ruta: '/remitos', icono: 'inbox', texto: 'Remitos' },
+    { modulo: 'lotes', ruta: '/lotes', icono: 'package', texto: 'Lotes' },
+    { modulo: 'movimientos', ruta: '/movimientos-stock', icono: 'swap', texto: 'Movimientos de stock' },
+    { modulo: 'alertas', ruta: '/historial-alertas', icono: 'bell', texto: 'Historial de alertas' },
+  ] },
+  { titulo: 'ANÁLISIS', items: [
+    { modulo: 'reportes', ruta: '/reportes', icono: 'chart', texto: 'Reportes' },
+  ] },
+  { titulo: 'SEGURIDAD', items: [
+    { modulo: 'perfiles', ruta: '/perfiles', icono: 'shield', texto: 'Perfiles de acceso' },
+    { modulo: 'permisos', ruta: '/permisos', icono: 'key', texto: 'Permisos del sistema' },
+    { modulo: 'auditoria', ruta: '/auditoria', icono: 'shield', texto: 'Auditoría' },
+  ] },
 ];
-
-const MENU_AUDITORIA = [
-  { ruta: '/auditoria', icono: 'shield', texto: 'Auditoría' },
-];
-
-const MENU_SECRETARIA = [
-  { seccion: 'ENTRADAS DE PRODUCTOS' },
-  { ruta: '/remitos', icono: 'inbox', texto: 'Remitos' },
-  { ruta: '/proveedores', icono: 'truck', texto: 'Consultar proveedores' },
-
-  { seccion: 'CONSULTAS DE STOCK' },
-  { ruta: '/productos', icono: 'package', texto: 'Consultar productos' },
-  { ruta: '/movimientos-stock', icono: 'swap', texto: 'Movimientos de stock' },
-];
-
-const MENU_VENDEDOR = [
-  { seccion: 'CONSULTAS DE STOCK' },
-  { ruta: '/productos', icono: 'package', texto: 'Productos y stock' },
-  { ruta: '/lotes', icono: 'package', texto: 'Consultar lotes' },
-  { ruta: '/tipos-productos', icono: 'layers', texto: 'Tipos de productos' },
-  { ruta: '/subtipos', icono: 'tags', texto: 'Subtipos' },
-  { ruta: '/mis-permisos', icono: 'key', texto: 'Mis permisos' },
-];
-
-function opcionesSegunPerfil(perfil) {
-  if (perfil === 'administrador') {
-    return [...MENU_ADMINISTRACION, ...MENU_AUDITORIA];
-  }
-  if (perfil === 'jefe') return MENU_ADMINISTRACION;
-  if (perfil === 'secretaria') return MENU_SECRETARIA;
-  if (perfil === 'vendedor') return MENU_VENDEDOR;
-  return [];
-}
 
 function Enlace({ ruta, icono, texto }) {
   return (
     <div className="nav-item">
-      <NavLink
-        to={ruta}
-        className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}
-      >
+      <NavLink to={ruta} className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}>
         <Icono nombre={icono} />
         <span>{texto}</span>
       </NavLink>
@@ -72,12 +39,21 @@ function Enlace({ ruta, icono, texto }) {
 }
 
 export default function Sidebar({ oculto }) {
-  const { usuario, cerrarSesion } = useSesion();
+  const { usuario, cerrarSesion, puede } = useSesion();
   const navigate = useNavigate();
 
-  const perfil = (usuario.perfil || '').toLowerCase();
-  const opciones = opcionesSegunPerfil(perfil);
   const inicial = (usuario.email || usuario.usuario || '?').charAt(0).toUpperCase();
+
+  const secciones = MENU
+    .map((s) => ({ ...s, items: s.items.filter((i) => puede(i.modulo)) }))
+    .filter((s) => s.items.length > 0);
+
+  if (!usuario.es_administrador) {
+    secciones.push({
+      titulo: 'MI CUENTA',
+      items: [{ ruta: '/mis-permisos', icono: 'key', texto: 'Mis permisos' }],
+    });
+  }
 
   async function salir(evento) {
     evento.preventDefault();
@@ -87,33 +63,27 @@ export default function Sidebar({ oculto }) {
 
   return (
     <aside className={'sidebar' + (oculto ? ' sidebar-hidden' : '')} id="sidebar">
-      {/* LOGO */}
       <div className="sidebar-logo">
-        <div className="logo-icon">
-          <Icono nombre="leaf" clase="logo-svg" />
-        </div>
+        <div className="logo-icon"><Icono nombre="leaf" clase="logo-svg" /></div>
         <div className="logo-text">
           <strong>Agroquímica</strong>
           <span>del Valle</span>
         </div>
       </div>
 
-      {/* MENÚ SEGÚN PERFIL */}
       <nav className="sidebar-nav">
         <Enlace ruta="/panel" icono="panel" texto="Panel Principal" />
 
-        {opciones.map((opcion, i) =>
-          opcion.seccion ? (
-            <div className="nav-section" key={'s' + i}>
-              <span className="nav-section-title">{opcion.seccion}</span>
+        {secciones.map((s) => (
+          <div key={s.titulo}>
+            <div className="nav-section">
+              <span className="nav-section-title">{s.titulo}</span>
             </div>
-          ) : (
-            <Enlace key={opcion.ruta + i} {...opcion} />
-          )
-        )}
+            {s.items.map((i) => <Enlace key={i.ruta} {...i} />)}
+          </div>
+        ))}
       </nav>
 
-      {/* PIE DEL SIDEBAR */}
       <div className="sidebar-footer">
         <div className="sidebar-user">
           <div className="sidebar-user-avatar">{inicial}</div>

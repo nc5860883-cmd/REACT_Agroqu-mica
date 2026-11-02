@@ -500,23 +500,35 @@ def egresos(request):
             if cantidad > stock.Cantidad_stock:
                 return _error('La cantidad supera el stock del producto.')
 
+            lote_antes = lote.Cantidad_actual
+            stock_antes = stock.Cantidad_stock
+
             lote.Cantidad_actual -= cantidad
             lote.save(update_fields=['Cantidad_actual'])
-
             stock.Cantidad_stock -= cantidad
             stock.save(update_fields=['Cantidad_stock'])
 
             detalle = TIPO_EGRESO
-
             if descripcion:
                 detalle = f'{TIPO_EGRESO}. {descripcion}'
 
-            MovimientosStock.objects.create(
-                ID_Usuario=usuario,
-                ID_Tipo_movimiento=tipo_egreso,
-                ID_Lote=lote,
-                Cantidad_movimiento_stock=cantidad,
-                Observaciones=detalle[:255],
+            movimiento = MovimientosStock.objects.create(
+                ID_Usuario=usuario, ID_Tipo_movimiento=tipo_egreso, ID_Lote=lote,
+                Cantidad_movimiento_stock=cantidad, Observaciones=detalle[:255],
+            )
+
+            registrar_auditoria(
+                usuario, 'Movimientos de Stock', movimiento, 'EGRESO_STOCK', {},
+                {
+                    'ID_Producto': producto.pk,
+                    'Lote': lote.Numero_lote,
+                    'Cantidad': cantidad,
+                    'Lote_antes': lote_antes,
+                    'Lote_despues': lote.Cantidad_actual,
+                    'Stock_antes': stock_antes,
+                    'Stock_despues': stock.Cantidad_stock,
+                    'Observaciones': detalle[:255],
+                },
             )
 
             stock_bajo = _alerta_stock_bajo(stock, producto)

@@ -28,7 +28,7 @@ from .auditoria import snapshot, registrar_auditoria
 from .models import Productos, Subtipos, TiposProductos, Usuarios
 from .permissions import MODULOS, PERFILES_ADMIN, permisos_asignados, puede
 
-
+import time
 # ============================================================
 # UTILIDADES
 # ============================================================
@@ -92,6 +92,7 @@ def _datos_usuario(usuario):
         'usuario': usuario.Usuario,
         'nombre': usuario.Nombre_usuario,
         'apellido': usuario.Apellido_usuario,
+        'email': usuario.Email_usuario,
         'perfil': usuario.ID_Perfil.Nombre_perfil,
         'es_administrador': _es_administrador(usuario),
         'cambiar_contrasena': usuario.Cambiar_contrasena,
@@ -157,7 +158,10 @@ def login(request):
 
     # Las mismas claves que usa login_view, así la sesión sirve
     # también para las pantallas Django.
+    request.session.cycle_key()
     request.session['usuario_id'] = usuario.ID_Usuario
+    request.session['bloqueada'] = False
+    request.session['ultima_actividad'] = time.time()
     request.session['usuario_nombre'] = usuario.Usuario
     request.session['perfil_id'] = usuario.ID_Perfil.ID_Perfil
     request.session['perfil_nombre'] = usuario.ID_Perfil.Nombre_perfil
@@ -263,10 +267,8 @@ def tipos_productos(request):
     if error:
         return _error(error)
 
-    tipo = TiposProductos.objects.create(
-        Nombre_tipo_producto=nombre,
-        Estado_tipo_producto=True,
-    )
+    tipo = TiposProductos.objects.create(Nombre_tipo_producto=nombre, Estado_tipo_producto=True)
+    registrar_auditoria(request.user, 'Tipos de productos', tipo, 'CREACION', {}, snapshot(tipo))
 
     return Response(_serializar_tipo(tipo), status=status.HTTP_201_CREATED)
 
@@ -366,7 +368,7 @@ def _eliminar_tipo(request, pk):
                     f'No se puede eliminar el tipo "{nombre}" porque '
                     f'tiene {cantidad_subtipos} subtipo(s) asociado(s).'
                 )
-
+            registrar_auditoria(request.user, 'Tipos de productos', tipo, 'ELIMINACION', snapshot(tipo), {})
             tipo.delete()
 
     except ProtectedError:

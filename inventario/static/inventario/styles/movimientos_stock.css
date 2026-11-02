@@ -19,16 +19,6 @@
 }
 
 /* ============================================================
-   CONFIGURACIÓN GENERAL
-   ============================================================ */
-
-body {
-    background: var(--fondo);
-    color: var(--texto);
-    font-family: 'Inter', sans-serif;
-}
-
-/* ============================================================
    ENCABEZADO
    ============================================================ */
 
@@ -370,3 +360,5 @@ body {
         transition: none;
     }
 }
+
+.tag-venta { display: inline-block; padding: 3px 10px; border-radius: 6px; background: #fee2e2; color: #b91c1c; }

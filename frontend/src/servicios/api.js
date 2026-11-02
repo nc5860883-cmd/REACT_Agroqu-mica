@@ -42,6 +42,7 @@ export async function pedir(ruta, { metodo = 'GET', datos } = {}) {
   if (!respuesta.ok) {
     const error = new Error(json.error || 'Ocurrió un error inesperado.');
     error.status = respuesta.status;
+    error.datos = json; // <-- nueva
     throw error;
   }
 

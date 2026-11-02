@@ -39,3 +39,27 @@ def registrar_auditoria(usuario, entidad, objeto, accion, antes, despues):
         Valores_anteriores=antes,
         Valores_actuales=despues,
     )
+
+
+def registrar_asignacion_perfil(usuario, usuario_objetivo, perfil_anterior, perfil_nuevo):
+    """Deja constancia del perfil asignado a un usuario."""
+    return registrar_auditoria(
+        usuario,
+        'Usuarios',
+        usuario_objetivo,
+        'MODIFICACION',
+        {'perfil': perfil_anterior.Nombre_perfil if perfil_anterior else ''},
+        {'perfil': perfil_nuevo.Nombre_perfil if perfil_nuevo else ''},
+    )
+
+
+def registrar_asignacion_permisos(usuario, perfil, antes, despues):
+    """Deja constancia de los permisos de un perfil (conjuntos de nombres)."""
+    return registrar_auditoria(
+        usuario,
+        'Perfiles',
+        perfil,
+        'MODIFICACION',
+        {'permisos': ', '.join(sorted(antes))},
+        {'permisos': ', '.join(sorted(despues))},
+    )
