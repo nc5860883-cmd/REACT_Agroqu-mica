@@ -126,6 +126,37 @@ class Remitos(models.Model):
 
     Fecha_remito = models.DateField()
 
+    ESTADO_CHOICES = [
+        ('Confirmado', 'Confirmado'),
+        ('Anulado', 'Anulado'),
+    ]
+
+    Estado_remito = models.CharField(
+        max_length=10,
+        choices=ESTADO_CHOICES,
+        default='Confirmado'
+    )
+
+    Fecha_anulacion = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    Motivo_anulacion = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+
+    ID_Usuario_anulacion = models.ForeignKey(
+        'Usuarios',
+        on_delete=models.PROTECT,
+        db_column='ID_Usuario_anulacion',
+        related_name='remitos_anulados',
+        null=True,
+        blank=True
+    )
+
     class Meta:
         db_table = 'REMITO'
         verbose_name = "Remito"
@@ -299,7 +330,7 @@ class Productos(models.Model):
 
     Nombre_producto = models.CharField(max_length=50)
 
-    Descripcion_producto = models.CharField(
+    Descripcion_producto = models.TextField(
         max_length=100,
         blank=True,
         null=True
@@ -321,6 +352,20 @@ class Productos(models.Model):
         max_length=20,
         null=True,
         blank=True
+    )
+
+    Unidades_por_presentacion = models.PositiveIntegerField(
+        default=1,
+        verbose_name='Unidades por presentación'
+    )
+
+    # Proveedores que suministran este producto.
+    proveedores = models.ManyToManyField(
+        Proveedores,
+        blank=True,
+        related_name='productos',
+        db_table='PRODUCTOS_X_PROVEEDORES',
+        verbose_name='Proveedores'
     )
 
     ESTADO_CHOICES = [
@@ -360,6 +405,18 @@ class Lotes(models.Model):
     )
 
     Numero_lote = models.CharField(max_length=50)
+
+    Cantidad_cajas = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name='Cantidad de cajas'
+    )
+
+    Unidades_por_caja = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name='Unidades por caja'
+    )
 
     Cantidad_ingresada = models.IntegerField()
 
@@ -525,10 +582,8 @@ class LogAuditoria(models.Model):
         related_name='auditorias'
     )
 
-    Perfil_usuario = models.CharField(max_length=100, null=True, blank=True)
-
     Fecha_hora = models.DateTimeField(auto_now_add=True)
-    Entidad = models.CharField(max_length=50)
+    Seccion = models.CharField(max_length=50)
     ID_Registro = models.IntegerField()
     Accion = models.CharField(max_length=20)
     Valores_anteriores = models.JSONField(default=dict)
