@@ -1,33 +1,41 @@
-import { useCallback, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from "react";
 
-// Hook que reemplaza a mostrarToast() y a los mensajes de Django
-export function useToasts() {
-    const [toasts, setToasts] = useState([]);
+// Reemplaza el bloque {% if messages %} de Django y la función mostrarToast().
+const ToastContext = createContext(null);
 
-    const quitar = useCallback((id) => {
-        setToasts((lista) => lista.filter((t) => t.id !== id));
-    }, []);
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
 
-    const mostrarToast = useCallback((mensaje, tipo = 'success') => {
-        const id = Date.now() + Math.random();
-        setToasts((lista) => [...lista, { id, mensaje, tipo }]);
-        setTimeout(() => quitar(id), 4000);
-    }, [quitar]);
+  const cerrar = useCallback((id) => {
+    setToasts((lista) => lista.filter((t) => t.id !== id));
+  }, []);
 
-    return { toasts, mostrarToast, quitar };
+  const mostrarToast = useCallback(
+    (mensaje, tipo = "success") => {
+      const id = crypto.randomUUID();
+      setToasts((lista) => [...lista, { id, mensaje, tipo }]);
+      setTimeout(() => cerrar(id), 4000);
+    },
+    [cerrar]
+  );
+
+  return (
+    <ToastContext.Provider value={mostrarToast}>
+      {children}
+      <div className="pr-toasts">
+        {toasts.map((t) => (
+          <div key={t.id} className={`pr-toast ${t.tipo}`}>
+            <span>{t.mensaje}</span>
+            <span className="pr-toast-x" onClick={() => cerrar(t.id)}>✕</span>
+          </div>
+        ))}
+      </div>
+    </ToastContext.Provider>
+  );
 }
 
-export default function Toasts({ toasts, onQuitar }) {
-    return (
-        <div className="pr-toasts">
-            {toasts.map((t) => (
-                <div key={t.id} className={`pr-toast ${t.tipo}`}>
-                    <span>{t.mensaje}</span>
-                    <span className="pr-toast-x" onClick={() => onQuitar(t.id)}>
-                        ✕
-                    </span>
-                </div>
-            ))}
-        </div>
-    );
+export function useToast() {
+  const ctx = useContext(ToastContext);
+  if (!ctx) throw new Error("useToast debe usarse dentro de <ToastProvider>");
+  return ctx;
 }

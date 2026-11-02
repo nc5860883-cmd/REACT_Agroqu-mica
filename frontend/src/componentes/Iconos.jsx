@@ -1,103 +1,31 @@
-// Los mismos íconos SVG de _sidebar.html.
-// <IconosSprite /> se dibuja una sola vez (en Layout) y
-// <Icono nombre="panel" /> los usa en cualquier lugar.
+// Íconos SVG que se repiten en todas las plantillas.
+const trazos = {
+  mas: ["M12 5v14M5 12h14"],
+  buscar: ["m21 21-4.3-4.3"],
+  editar: [
+    "M12 20h9",
+    "M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z",
+  ],
+  eliminar: ["M3 6h18", "M8 6V4h8v2", "M19 6l-1 14H6L5 6", "M10 11v5", "M14 11v5"],
+  cerrar: ["M18 6 6 18M6 6l12 12"],
+  check: ["M20 6 9 17l-5-5"],
+  alerta: ["M12 9v4", "M12 17h.01"],
+  caja: [
+    "m7.5 4.27 9 5.15",
+    "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z",
+    "m3.3 7 8.7 5 8.7-5",
+    "M12 22V12",
+  ],
+};
 
-export function IconosSprite() {
+export default function Icono({ nombre }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" style={{ display: 'none' }}>
-      <symbol id="i-leaf" viewBox="0 0 24 24">
-        <path d="M20.5 3.5C12 3.5 5.5 6.5 4 13c-.7 3.1 1.1 5.8 4.2 6.5 3.3.7 6.5-1.5 7.8-4.5 0.9-2 1.2-4.2 1.1-6.4-2.7.7-5.2 2-7.3 3.9-1.5 1.4-2.6 3.1-3.4 5" />
-      </symbol>
-
-      <symbol id="i-panel" viewBox="0 0 24 24">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </symbol>
-
-      <symbol id="i-users" viewBox="0 0 24 24">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </symbol>
-
-      <symbol id="i-package" viewBox="0 0 24 24">
-        <path d="m21 16-9 5-9-5V8l9-5 9 5v8Z" />
-        <path d="m3.3 7.8 8.7 5 8.7-5" />
-        <path d="M12 22V12.8" />
-        <path d="m7.5 5.5 9 5" />
-      </symbol>
-
-      <symbol id="i-layers" viewBox="0 0 24 24">
-        <polygon points="12 2 22 7 12 12 2 7 12 2" />
-        <polyline points="2 12 12 17 22 12" />
-        <polyline points="2 17 12 22 22 17" />
-      </symbol>
-
-      <symbol id="i-tags" viewBox="0 0 24 24">
-        <path d="M20.59 13.41 11 3.83V3H4v7h.83l9.58 9.59a2 2 0 0 0 2.83 0l3.35-3.35a2 2 0 0 0 0-2.83Z" />
-        <circle cx="7.5" cy="6.5" r="1" />
-      </symbol>
-
-      <symbol id="i-truck" viewBox="0 0 24 24">
-        <rect x="1" y="3" width="15" height="13" rx="1" />
-        <path d="M16 8h4l3 3v5h-7V8Z" />
-        <circle cx="5.5" cy="18.5" r="2.5" />
-        <circle cx="18.5" cy="18.5" r="2.5" />
-      </symbol>
-
-      <symbol id="i-inbox" viewBox="0 0 24 24">
-        <path d="M3 4h18v16H3z" />
-        <path d="M3 14h5l2 3h4l2-3h5" />
-      </symbol>
-
-      <symbol id="i-swap" viewBox="0 0 24 24">
-        <path d="M7 7h13l-3-3" />
-        <path d="m20 7-3 3" />
-        <path d="M17 17H4l3 3" />
-        <path d="m4 17 3-3" />
-      </symbol>
-
-      <symbol id="i-bell" viewBox="0 0 24 24">
-        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-        <path d="M10 21h4" />
-      </symbol>
-
-      <symbol id="i-shield" viewBox="0 0 24 24">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-        <path d="m9 12 2 2 4-4" />
-      </symbol>
-
-      <symbol id="i-key" viewBox="0 0 24 24">
-        <circle cx="7.5" cy="15.5" r="5.5" />
-        <path d="m12 12 9-9" />
-        <path d="m17 7 3 3" />
-        <path d="m14 10 3 3" />
-      </symbol>
-
-      <symbol id="i-logout" viewBox="0 0 24 24">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
-      </symbol>
-
-      <symbol id="i-chart" viewBox="0 0 24 24">
-        <line x1="4" y1="20" x2="20" y2="20" />
-        <rect x="6" y="11" width="3" height="9" />
-        <rect x="11" y="6" width="3" height="14" />
-        <rect x="16" y="14" width="3" height="6" />
-      </symbol>
-      
-    </svg>
-  );
-}
-
-export function Icono({ nombre, clase = 'nav-icon' }) {
-  return (
-    <svg className={clase}>
-      <use href={`#i-${nombre}`} />
+    <svg className="pr-icon" viewBox="0 0 24 24">
+      {nombre === "buscar" && <circle cx="11" cy="11" r="7" />}
+      {nombre === "alerta" && <circle cx="12" cy="12" r="10" />}
+      {(trazos[nombre] ?? []).map((d) => (
+        <path key={d} d={d} />
+      ))}
     </svg>
   );
 }

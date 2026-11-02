@@ -24,6 +24,11 @@ urlpatterns = [
     path('subtipos/', api_catalogos.subtipos, name='api_subtipos'),
     path('subtipos/<int:pk>/', api_catalogos.subtipo_detalle, name='api_subtipo_detalle'),
 
+
+    # Remitos
+    path('remitos/', api_productos.remitos, name='api_remitos'),
+    path('remitos/<int:pk>/', api_productos.remito_detalle, name='api_remito_detalle'),
+
     # Proveedores
     path('proveedores/', api_catalogos.proveedores, name='api_proveedores'),
     path('proveedores/<int:pk>/', api_catalogos.proveedor_detalle, name='api_proveedor_detalle'),

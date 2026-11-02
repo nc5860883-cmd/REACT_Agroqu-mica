@@ -1,31 +1,24 @@
-import { IconoCerrar } from './IconosProductos';
+import Icono from "./Icono";
 
-// Reemplaza a abrirModal/cerrarModal y al "clic fuera para cerrar".
-// En React el modal se muestra solo si el padre lo renderiza.
-export default function Modal({ titulo, onCerrar, className = '', children }) {
-    return (
-        <div
-            className="pr-modal"
-            style={{ display: 'flex' }}
-            onClick={(e) => {
-                if (e.target === e.currentTarget) onCerrar();
-            }}
-        >
-            <div className={`pr-modal-box ${className}`}>
-                <div className="pr-modal-head">
-                    <h2>{titulo}</h2>
-                    <button
-                        type="button"
-                        className="pr-modal-x"
-                        onClick={onCerrar}
-                        aria-label="Cerrar"
-                    >
-                        <IconoCerrar />
-                    </button>
-                </div>
+// Reemplaza los <div class="pr-modal"> + abrirModal()/cerrarModal() + "clic fuera para cerrar".
+export default function Modal({ abierto, titulo, onCerrar, children, className = "" }) {
+  if (!abierto) return null;
 
-                {children}
-            </div>
+  return (
+    <div
+      className="pr-modal"
+      style={{ display: "flex" }}
+      onClick={(e) => e.target === e.currentTarget && onCerrar()}
+    >
+      <div className={`pr-modal-box ${className}`}>
+        <div className="pr-modal-head">
+          <h2>{titulo}</h2>
+          <button type="button" className="pr-modal-x" onClick={onCerrar} aria-label="Cerrar">
+            <Icono nombre="cerrar" />
+          </button>
         </div>
-    );
+        {children}
+      </div>
+    </div>
+  );
 }
