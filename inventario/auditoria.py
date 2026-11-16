@@ -1,15 +1,20 @@
+
 from datetime import date, datetime
 from decimal import Decimal
+
 from .models import LogAuditoria
 
-CAMPOS_EXCLUIDOS = {'Contrasena'}   # nunca guardar el hash
+
+CAMPOS_EXCLUIDOS = {'Contrasena'}
 
 
 def _serializar(valor):
     if isinstance(valor, (datetime, date)):
         return valor.isoformat()
+
     if isinstance(valor, Decimal):
         return str(valor)
+
     return valor
 
 
@@ -28,12 +33,7 @@ def registrar_auditoria(usuario, entidad, objeto, accion, antes, despues):
 
     return LogAuditoria.objects.create(
         ID_Usuario=usuario,
-        Perfil_usuario=(
-            usuario.ID_Perfil.Nombre_perfil
-            if usuario and usuario.ID_Perfil
-            else "Sin perfil"
-        ),
-        Entidad=entidad,
+        Seccion=entidad,
         ID_Registro=objeto.pk,
         Accion=accion,
         Valores_anteriores=antes,
@@ -54,7 +54,7 @@ def registrar_asignacion_perfil(usuario, usuario_objetivo, perfil_anterior, perf
 
 
 def registrar_asignacion_permisos(usuario, perfil, antes, despues):
-    """Deja constancia de los permisos de un perfil (conjuntos de nombres)."""
+    """Deja constancia de los permisos de un perfil."""
     return registrar_auditoria(
         usuario,
         'Perfiles',

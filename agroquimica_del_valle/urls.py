@@ -76,6 +76,8 @@ urlpatterns = [
 
     # Permisos
     path('permisos/', views.gestion_permisos, name='gestion_permisos'),
+    path('permisos/crear/', views.crear_permiso, name='crear_permiso'),
+
 
     # Auditoría (solo administrador)
     path('auditoria/', views.gestion_auditoria, name='gestion_auditoria'),

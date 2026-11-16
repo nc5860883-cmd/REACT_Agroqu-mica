@@ -1890,7 +1890,30 @@ def gestion_permisos(request):
         }
     )
 
+def crear_permiso(request):
 
+    if request.method == 'POST':
+
+        nombre = request.POST.get('Nombre_permiso', '').strip()
+        descripcion = request.POST.get('Descripcion_permiso', '').strip()
+
+        if not nombre:
+            messages.error(request, 'El nombre del permiso es obligatorio.')
+            return redirect('gestion_permisos')
+
+        if Permisos.objects.filter(Nombre_permiso__iexact=nombre).exists():
+            messages.error(request, 'Este permiso ya se encuentra registrado.')
+            return redirect('gestion_permisos')
+
+        Permisos.objects.create(
+            Nombre_permiso=nombre,
+            Descripcion_permiso=descripcion or None
+        )
+
+        messages.success(request, 'Permiso registrado correctamente.')
+        return redirect('gestion_permisos')
+
+    return redirect('gestion_permisos')
 
 # ============================================================
 # MIS PERMISOS
